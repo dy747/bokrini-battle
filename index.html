@@ -118,6 +118,11 @@ html.port .exitBtn.exitTop{position:absolute;top:0;left:0;padding:3px 9px;font-s
 #joy{opacity:.38;transition:opacity .15s}
 /* rotated on a portrait phone: keep the joystick clear of the in-app browser's floating close button (physical top-left) */
 html.rot #joy{left:110px}
+/* rotated: map the phone's physical safe areas onto the rotated sides and leave breathing room at the (logical) top */
+html.rot .ov{padding:calc(env(safe-area-inset-right,0px) + 30px) max(16px,calc(env(safe-area-inset-bottom,0px) + 12px)) calc(env(safe-area-inset-left,0px) + 18px) max(16px,calc(env(safe-area-inset-top,0px) + 10px))}
+html.rot #selOv>.card{gap:calc(var(--lh,1vh)*2.4)}
+html.rot .sel{flex-basis:calc(var(--lh,1vh)*56)}
+html.rot #btns{right:calc(env(safe-area-inset-bottom,0px) + 14px)}
 #joy.on{opacity:.8}
 #knob{position:absolute;left:50%;top:50%;width:42%;aspect-ratio:1;border-radius:50%;transform:translate(-50%,-50%);
   background:radial-gradient(circle at 35% 30%,#e9ecff,#7f86b5 60%,#3b3f66);box-shadow:0 3px 8px rgba(0,0,0,.6)}
@@ -288,7 +293,7 @@ html.short .stat{gap:1px 6px}
 
 <div class="ov" id="selOv">
   <div class="card">
-    <div class="selHead"><button class="exitBtn exitTop" type="button">완전 종료</button><div class="logo">복린이 대전<small>ROOKIE BOXING BATTLE</small></div><p class="credit"><span>v1.4</span><a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a></p></div>
+    <div class="selHead"><button class="exitBtn exitTop" type="button">완전 종료</button><div class="logo">복린이 대전<small>ROOKIE BOXING BATTLE</small></div><p class="credit"><span>v1.5</span><a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a></p></div>
     <div class="sel" id="sel"></div>
     <p class="help selhelp"><b>↓</b> 숙이면 펀치 회피 · <b>뒤로 당기기/가드</b> 막기 · 펀치 <b>이어 누르면 콤보</b> · 게이지 차면 <b>SUPER</b> · 3판 2선승</p>
     <button class="btn" id="goBtn" type="button">링 위로 올라가기</button>
@@ -969,7 +974,7 @@ function makeCard(){
   x.fillText(win?'나랑 붙어볼 복서 구함 👊':'누가 대신 복수 좀 👊',540,1160);
   x.fillStyle='#151233';x.fillRect(0,1232,1080,120);
   x.font='700 34px "Noto Sans KR",sans-serif';x.fillStyle='#f6efe3';x.fillText('@nangman.boxer',540,1272);
-  x.font='26px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';x.fillText('dy747.github.io/bokrini-battle  ·  v1.4',540,1314);
+  x.font='26px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';x.fillText('dy747.github.io/bokrini-battle  ·  v1.5',540,1314);
   return C;
 }
 let shotFile=null;
