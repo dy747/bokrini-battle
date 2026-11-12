@@ -359,7 +359,7 @@ html.port #endBtn{align-self:center}
 
 <div class="ov" id="selOv">
   <div class="card">
-    <div class="selHead"><div class="selLeft"><button class="exitBtn exitTop" type="button">완전 종료</button><p class="cnt" id="cnt" aria-live="polite"></p></div><div class="logo">복린이 대전<small>ROOKIE BOXING BATTLE</small></div><p class="credit"><span>v3.1</span><a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a></p></div>
+    <div class="selHead"><div class="selLeft"><button class="exitBtn exitTop" type="button">완전 종료</button><p class="cnt" id="cnt" aria-live="polite"></p></div><div class="logo">복린이 대전<small>ROOKIE BOXING BATTLE</small></div><p class="credit"><span>v3.2</span><a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a></p></div>
     <div class="sel" id="sel"></div>
     <p class="help selhelp"><b>뒤로+2</b> 또는 <b>백스텝→2</b> 쓱박 · 펀치마다 <b>스태미나</b> 소모, 가드·백스텝으로 회복 · 콤보 <b>1-1 · 1-2 · 1-어퍼 · 훅-훅 · 훅-2</b> … 숨은 기술도 찾아보세요</p>
     <button class="btn" id="goBtn" type="button">링 위로 올라가기</button>
@@ -790,9 +790,9 @@ function buzz(ms){try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}}
 let mode='select',paused=false,round=1,timer=60,introT=0,endT=0,hitstop=0,superFreeze=0,shake=0,projs=[],sparks=[],rWin=null;
 let pick=0,P1,P2,lastAtk=null;
 const STAM={nangman:100,gobong:92,pigeon:112,candy:100};
-const COST={jab:11,straight:16,hook:21,upper:23,body:17,sbak:8};
+const COST={jab:9,straight:13,hook:17,upper:18,body:14,sbak:6};
 const hpMax=F=>F.ch.hp*(F.boss?1.2:1);
-const stamCap=F=>F.stamMax*(.45+.55*Math.max(0,F.hp)/hpMax(F)); // the more HP you lose, the lower your stamina ceiling
+const stamCap=F=>F.stamMax*(.6+.4*Math.max(0,F.hp)/hpMax(F)); // the more HP you lose, the lower your stamina ceiling
 const fatigue=F=>Math.max(0,Math.min(1,F.stam/F.stamMax));
 function newFighter(ch,x,f,cpu){return{stam:STAM[ch.id]||100,stamMax:STAM[ch.id]||100,tired:false,bsT:-99,atkStart:-99,ch,x,y:0,vx:0,vy:0,f,hp:ch.hp,sup:0,st:'idle',t:0,mf:0,md:null,move:null,anim:0,walkT:0,koT:0,
   combo:0,hitDone:false,hitLanded:false,buf:null,bufT:0,wins:0,cpu,ctrl:{dir:0,down:false,guard:false,press:null},ai:{wait:20,chain:false,lvl:.55},
@@ -819,7 +819,7 @@ const COMBOS=[{s:['jab','straight','body'],n:'원투 바디',v:'원투 바디'},
   {s:['jab','hook'],n:'원 훅',v:'원 훅'},{s:['hook','hook'],n:'양훅',v:'양 훅'},{s:['jab','jab'],n:'잽잽',v:'잽 잽'},{s:['jab','straight'],n:'원투',v:'원 투'},
   {s:['jab','upper'],n:'원 어퍼',v:'원 어퍼'},{s:['hook','straight'],n:'훅 투',v:'훅 투'},{s:['hook','upper'],n:'훅 어퍼',v:'훅 어퍼'}];
 function matchCombo(seq){if(!seq||seq.length<2)return null;for(const c of COMBOS){const k=c.s.length;if(seq.length>=k&&c.s.every((m,i)=>seq[seq.length-k+i]===m))return c;}return null;}
-function startMove(F,mv){F.atkStart=F.anim;const fr=fatigue(F);F.punchPow=.5+.5*fr;F.punchSpd=.62+.38*fr;F.stam=Math.max(0,F.stam-(COST[mv]||9));if(F.stam<=0&&!F.tired){F.tired=true;if(F===P1){popAt('스태미나 부족!\n가드·백스텝으로 회복',F.x,GROUND-88,'warn');sfx.nope();}else popAt('숨차!',F.x,GROUND-80,'mid');}if(F.seqT!=null&&F.anim-F.seqT<=30)F.seq.push(mv);else F.seq=[mv];if(F.seq.length>4)F.seq.shift();F.seqT=F.anim;F.st='attack';F.move=mv;F.md=scaled(MOVES[mv],F.ch.spd*F.punchSpd);F.mf=0;F.hitDone=false;F.hitLanded=false;sfx.swing();if(fr<.3&&F===P1)popAt('헉헉',F.x-F.f*6,GROUND-74,'mid');}
+function startMove(F,mv){F.atkStart=F.anim;const fr=fatigue(F);F.punchPow=.65+.35*fr;F.punchSpd=.75+.25*fr;F.stam=Math.max(0,F.stam-(COST[mv]||9));if(F.stam<=0&&!F.tired){F.tired=true;if(F===P1){popAt('스태미나 부족!\n가드·백스텝으로 회복',F.x,GROUND-88,'warn');sfx.nope();}else popAt('숨차!',F.x,GROUND-80,'mid');}if(F.seqT!=null&&F.anim-F.seqT<=30)F.seq.push(mv);else F.seq=[mv];if(F.seq.length>4)F.seq.shift();F.seqT=F.anim;F.st='attack';F.move=mv;F.md=scaled(MOVES[mv],F.ch.spd*F.punchSpd);F.mf=0;F.hitDone=false;F.hitLanded=false;sfx.swing();if(fr<.3&&F===P1)popAt('헉헉',F.x-F.f*6,GROUND-74,'mid');}
 const AURA={nangman:'#3f7bff',gobong:'#d8262f',pigeon:'#3fbf8a',candy:'#ff4fb0'};
 let cutIn=null,rings=[],parts=[];
 function whiteFlash(){const f=$('wflash');f.classList.remove('on');void f.offsetWidth;f.classList.add('on');}
@@ -839,7 +839,7 @@ function applyHit(A,D,h){
   if(h.high&&crouching&&!h.sup){popAt('슥',D.x,GROUND-50,'mid');sfx.dodge();return 'dodge';}
   const guarding=D.ctrl.guard||D.ctrl.dir===-D.f;
   if((isFree(D)||D.st==='blockstun')&&guarding){
-    const chip=Math.max(1,Math.round(h.dmg*(h.sup?.35:.18)*A.ch.pow));D.hp-=chip;D.stam=Math.max(0,D.stam-(h.sup?6:3));
+    const chip=Math.max(1,Math.round(h.dmg*(h.sup?.35:.18)*A.ch.pow));D.hp-=chip;D.stam=Math.max(0,D.stam-(h.sup?5:2));
     D.st='blockstun';D.t=Math.round(h.hs*.6);D.vx=A.f*h.kb*.9;
     A.sup=Math.min(100,A.sup+h.gain*.3);D.sup=Math.min(100,D.sup+h.gain*.4);
     spark(D.x-A.f*6,GROUND-48,'block');sfx.block();hitstop=Math.max(hitstop,4);
@@ -851,7 +851,7 @@ function applyHit(A,D,h){
   const counter=D.st==='attack'&&D.mf<D.md.s;
   const cmb=A.st==='attack'?(A.move==='sbak'?{n:'쓱박',v:'쓱 박',s:[1,2,3]}:matchCombo(A.seq)):null;
   let dmg=h.dmg*A.ch.pow*(h.sup?1:(A.punchPow||1))*(1-.08*Math.min(A.combo,6))*(counter?1.25:1)*(cmb?1.2:1);dmg=Math.max(1,Math.round(dmg));
-  D.stam=Math.max(0,D.stam-dmg*(h.high===false&&!h.sup?1.6:.8)); // getting hit takes your breath away, body shots most of all
+  D.stam=Math.max(0,D.stam-dmg*(h.high===false&&!h.sup?1.2:.6)); // getting hit takes your breath away, body shots most of all
   if(cmb&&A.move==='sbak'){popAt('쓱박!',(A.x+D.x)/2,GROUND-96,'cmb sbk');sfx.sbak();sayKo('쓱 박!');whiteFlash();hitstop=Math.max(hitstop,16);shake=Math.max(shake,7);
     rings.push({x:D.x-A.f*4,y:GROUND-50,t:0,big:true,col:'#ffd23a'});burst(D.x-A.f*4,GROUND-50,26,'#ffd23a');A.sup=Math.min(100,A.sup+15);}
   else if(cmb){popAt(cmb.n+'!',(A.x+D.x)/2,GROUND-92,'cmb');sfx.combo(cmb.s.length);if(A===P1)sayKo(cmb.v);hitstop=Math.max(hitstop,7);shake=Math.max(shake,3);}
@@ -884,9 +884,9 @@ function updateFighter(F,O){
   if(c.press){F.buf=c.press;F.bufT=12;c.press=null;}else if(F.bufT>0)F.bufT--;else F.buf=null;
   const canAct=mode==='fight';
   { // stamina: refills while guarding / blocking / backstepping, slowly while idle
-    const rest=F.anim-F.atkStart>32; // no catching your breath right after throwing
-    const r={block:.42,blockstun:0,bstep:.7,idle:rest?.09:0,walk:rest?.05:0,crouch:rest?.09:0}[F.st]||0;F.cap=stamCap(F);F.stam=Math.min(F.cap,F.stam+r);
-    if(F.tired&&F.stam>=Math.min(F.stamMax*.45,(F.cap||F.stamMax)*.9)){F.tired=false;if(F===P1){popAt('스태미나 회복!',F.x,GROUND-84,'ok');sfx.blip();}}}
+    const rest=F.anim-F.atkStart>16; // no catching your breath right after throwing
+    const r={block:.48,blockstun:.25,bstep:.8,idle:rest?.12:0,walk:rest?.08:0,crouch:rest?.12:0}[F.st]||0;F.cap=stamCap(F);F.stam=Math.min(F.cap,F.stam+r);
+    if(F.tired&&F.stam>=Math.min(F.stamMax*.42,(F.cap||F.stamMax)*.9)){F.tired=false;if(F===P1){popAt('스태미나 회복!',F.x,GROUND-84,'ok');sfx.blip();}}}
   // reversal: answer an opponent's SUPER with your own SUPER -> the later one wins
   if(canAct&&F.buf==='super'&&F.sup>=100&&O.st==='super'&&!['super','ko'].includes(F.st)){F.buf=null;startSuper(F);return;}
   switch(F.st){
@@ -912,7 +912,7 @@ function updateFighter(F,O){
       F.f=O.x>F.x?1:-1;
       if(canAct&&F.buf){const mv=resolveMove(F.buf,c,F,O);
         if(mv==='super'){if(F.sup>=100){startSuper(F);F.buf=null;break;}}
-        else if(mv==='bstep'){F.st='bstep';F.t=12;F.bsT=F.anim;F.stam=Math.min(F.cap||F.stamMax,F.stam+4);F.buf=null;sfx.dodge();break;}
+        else if(mv==='bstep'){F.st='bstep';F.t=12;F.bsT=F.anim;F.stam=Math.min(F.cap||F.stamMax,F.stam+5);F.buf=null;sfx.dodge();break;}
         else if(mv){startMove(F,mv);F.buf=null;break;}
         else F.buf=null;}
       if(!canAct){F.st='idle';break;}
@@ -1371,7 +1371,7 @@ function makeChampCard(){
   T(ENDTXT[arc.ch.id].key,1195,'900 40px "Noto Sans KR",sans-serif','#ff4fb0');
   x.fillStyle='#151233';x.fillRect(0,1240,1080,110);
   T('@nangman.boxer',1278,'700 34px "Noto Sans KR",sans-serif','#f6efe3');
-  T('dy747.github.io/bokrini-battle  ·  v3.1',1318,'26px "Noto Sans KR",sans-serif','#a39cc9');
+  T('dy747.github.io/bokrini-battle  ·  v3.2',1318,'26px "Noto Sans KR",sans-serif','#a39cc9');
   return C;}
 
 let resScene=null;
@@ -1421,7 +1421,7 @@ function makeCard(){
   x.fillText(champ?'복린이 체육관 접수 완료 🏆':win?'나랑 붙어볼 복서 구함 👊':'누가 대신 복수 좀 👊',540,1160);
   x.fillStyle='#151233';x.fillRect(0,1232,1080,120);
   x.font='700 34px "Noto Sans KR",sans-serif';x.fillStyle='#f6efe3';x.fillText('@nangman.boxer',540,1272);
-  x.font='26px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';x.fillText('dy747.github.io/bokrini-battle  ·  v3.1',540,1314);
+  x.font='26px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';x.fillText('dy747.github.io/bokrini-battle  ·  v3.2',540,1314);
   return C;
 }
 let shotFile=null;
