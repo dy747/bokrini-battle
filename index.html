@@ -171,6 +171,21 @@ html.port{}
 .phone{width:46px;height:80px;border:4px solid var(--chalk);border-radius:8px;animation:rot 1.6s ease-in-out infinite}
 @keyframes rot{0%,30%{transform:rotate(0)}60%,100%{transform:rotate(-90deg)}}
 #oriOv{z-index:20;background:var(--bg)}
+#fsOv{z-index:25;background:var(--bg)}
+#fsOv .card{max-width:420px;gap:14px}
+#fsOv h2{margin:0;font:400 clamp(22px,6.4vw,30px)/1.25 var(--f-display);color:var(--chalk);text-wrap:balance;text-shadow:2px 2px 0 var(--red)}
+#fsOv .sub{margin:0;color:var(--dim);font-size:14px;font-weight:700;line-height:1.5}
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:8px;width:100%;text-align:left}
+.steps li{display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:center;background:var(--panel);border:2px solid var(--line);padding:10px 12px;font-size:15px;font-weight:700;line-height:1.45}
+.steps li>span{width:34px;height:34px;border-radius:50%;background:var(--gold);color:#1a1200;display:grid;place-items:center;font:900 17px var(--f-body)}
+.ico{display:inline-grid;place-items:center;min-width:26px;height:26px;padding:0 4px;border:2px solid var(--chalk);border-radius:7px;font-size:14px;vertical-align:middle;margin:0 2px;box-sizing:border-box}
+#fsOv a.btn{display:block;text-decoration:none;box-sizing:border-box;text-align:center}
+#fsOv .btn{width:100%;font-size:18px;padding-block:16px}
+#fsOv .btn.ghost{font-size:15px;padding-block:12px}
+.note{margin:0;font-size:12.5px;color:var(--dim);line-height:1.55}
+.note b{color:var(--chalk)}
+.arrowDown{font-size:34px;color:var(--gold);animation:bob .8s ease-in-out infinite alternate;line-height:1}
+@keyframes bob{to{transform:translateY(8px)}}
 .orient{display:flex;gap:8px;justify-content:center}
 .orient .btn{min-width:0;padding:9px 16px;font-size:14px}
 .orient .btn.on{border-color:var(--gold);color:var(--gold)}
@@ -263,6 +278,10 @@ html.port .sel{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:
       <button class="btn" id="againBtn" type="button">한 판 더</button>
     </div>
   </div>
+</div>
+
+<div class="ov" id="fsOv" hidden>
+  <div class="card" id="fsCard"></div>
 </div>
 
 <div class="ov" id="oriOv" hidden>
@@ -907,7 +926,7 @@ addEventListener('blur',()=>{keys.clear();btnGuard=0;syncInp();});
 let orient='port';try{orient=localStorage.getItem('bk-orient')||'port'}catch(e){}
 let ROT=false;
 function fit(){
-  const rw=innerWidth,rh=innerHeight;ROT=orient==='land'&&rh>rw;
+  const rw=innerWidth,rh=innerHeight;ROT=orient==='land'&&rh>rw&&$('oriOv').hidden&&$('fsOv').hidden;
   const de=document.documentElement;de.classList.toggle('rot',ROT);
   const vw=ROT?rh:rw,vh=ROT?rw:rh,portrait=vh>vw;de.classList.toggle('port',portrait);
   de.style.setProperty('--sw',vw+'px');de.style.setProperty('--sh',vh+'px');de.style.setProperty('--lh',(vh/100)+'px');
@@ -925,7 +944,45 @@ function fit(){
 function setOrient(o){orient=o;try{localStorage.setItem('bk-orient',o)}catch(e){}fit();}
 function oriPick(o,e){if(e)e.preventDefault();if($('oriOv').hidden)return;$('oriOv').hidden=true;ensureAudio();setOrient(o);if(!isIOS)goFull(o==='land');}
 for(const [id,o] of [['oriPort','port'],['oriLand','land']]){const b=$(id);b.addEventListener('click',e=>oriPick(o,e));b.addEventListener('pointerup',e=>oriPick(o,e));}
-if(innerHeight>innerWidth)$('oriOv').hidden=false;
+/* ---- full-screen guide for beginners ---- */
+const UA=navigator.userAgent;
+const isAndroid=/Android/i.test(UA);
+const iosInApp=isIOS&&(/Instagram|FBAN|FBAV|KAKAOTALK|NAVER\(|Line\/|Claude|DaumApps|Twitter|everytimeApp/i.test(UA)||!/Safari\//.test(UA));
+const andInApp=isAndroid&&(/; wv\)|Instagram|FBAN|FBAV|KAKAOTALK|NAVER\(|Line\//i.test(UA));
+const here=location.host+location.pathname;
+function showOri(){if(innerHeight>innerWidth||ROT)$('oriOv').hidden=false;fit();}
+function closeFs(){$('fsOv').hidden=true;showOri();}
+function fsGuide(){
+  const c=$('fsCard');let h='';
+  if(!/github\.io$/.test(location.host)&&!/[?&]guide/.test(location.search)){showOri();return;}
+  if(standalone){showOri();return;}
+  if(isIOS&&iosInApp){
+    h=`<h2>Safari로 열면<br>전체화면으로 할 수 있어요</h2>
+      <p class="sub">지금은 인스타·카톡 같은 앱 안의 화면이라<br>화면이 작게 보여요.</p>
+      <a class="btn" id="fsOpen" href="x-safari-https://${here}">Safari로 열기</a>
+      <p class="note">버튼을 눌러도 안 열리면<br>화면 위나 아래의 <span class="ico">•••</span> 또는 <span class="ico">🧭</span> 를 누르고<br><b>'Safari로 열기'</b> 또는 <b>'외부 브라우저로 열기'</b>를 고르세요.</p>
+      <button class="btn ghost" id="fsSkip" type="button">그냥 여기서 할래요</button>`;
+  }else if(isIOS){
+    h=`<h2>홈 화면에 추가하면<br>전체화면 앱처럼 돼요</h2>
+      <ol class="steps">
+        <li><span>1</span><div>화면 아래 <span class="ico">⬆</span> <b>공유</b> 버튼을 누르세요<br><small style="color:var(--dim)">안 보이면 <span class="ico">•••</span> 를 먼저 누르세요</small></div></li>
+        <li><span>2</span><div><b>'홈 화면에 추가'</b>를 누르고<br>오른쪽 위 <b>'추가'</b>를 누르세요</div></li>
+        <li><span>3</span><div>바탕화면에 생긴 <b>복린이 대전</b> 아이콘으로 실행하면 끝!</div></li>
+      </ol>
+      <p class="note">아래쪽에 <span class="ico">🧭</span> 버튼이 보이면 앱 안 화면이에요.<br>그 버튼을 눌러 <b>Safari</b>로 먼저 연 다음 따라 하세요.</p>
+      <div class="arrowDown" aria-hidden="true">↓</div>
+      <button class="btn ghost" id="fsSkip" type="button">그냥 여기서 할래요</button>`;
+  }else if(isAndroid&&andInApp){
+    h=`<h2>크롬으로 열면<br>전체화면으로 할 수 있어요</h2>
+      <p class="sub">지금은 인스타·카톡 같은 앱 안의 화면이에요.</p>
+      <a class="btn" id="fsOpen" href="intent://${here}#Intent;scheme=https;package=com.android.chrome;end">크롬으로 열기</a>
+      <p class="note">안 열리면 오른쪽 위 <span class="ico">⋮</span> 를 누르고<br><b>'다른 브라우저로 열기'</b>를 고르세요.</p>
+      <button class="btn ghost" id="fsSkip" type="button">그냥 여기서 할래요</button>`;
+  }else{showOri();return;}
+  c.innerHTML=h;$('fsOv').hidden=false;
+  $('fsSkip').addEventListener('click',closeFs);
+}
+fsGuide();
 document.addEventListener('touchmove',e=>{if(!e.target.closest||!e.target.closest('.ov'))e.preventDefault();},{passive:false});
 ['gesturestart','gesturechange'].forEach(t=>document.addEventListener(t,e=>e.preventDefault()));
 document.querySelectorAll('#joy,.b').forEach(el=>el.addEventListener('touchstart',e=>e.preventDefault(),{passive:false}));
