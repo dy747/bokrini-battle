@@ -74,6 +74,9 @@ body{margin:0;background:var(--bg);color:var(--chalk);font-family:var(--f-body);
 .mid{text-align:center;line-height:1;padding-top:calc(var(--u)*1px)}
 .mid small{display:block;font-family:var(--f-px);font-size:calc(var(--u)*3.6px);color:var(--chalk)}
 .mid span{font-family:var(--f-px);font-size:calc(var(--u)*11px);color:var(--gold);text-shadow:0 calc(var(--u)*1px) 0 #8a3d00;display:block;margin-top:calc(var(--u)*2px);font-variant-numeric:tabular-nums}
+#exitHud{position:absolute;left:calc(var(--u)*48px);top:calc(var(--u)*30px);height:calc(var(--u)*11px);padding:0 calc(var(--u)*3px);background:rgba(60,10,20,.7);border:1px solid var(--red);color:#fff;font:900 calc(var(--u)*5px) var(--f-body);cursor:pointer}
+.exitBtn.exitTop{justify-self:start;align-self:start;white-space:nowrap;width:max-content;height:auto;min-width:0;line-height:1.2;background:transparent;border:2px solid var(--red);color:#ff8a96;font:900 13px var(--f-body);padding:7px 12px;cursor:pointer}
+html.port .exitBtn.exitTop{position:absolute;top:0;left:0;padding:3px 9px;font-size:11px}
 #sndBtn{position:absolute;left:calc(var(--u)*34px);top:calc(var(--u)*30px);width:calc(var(--u)*11px);height:calc(var(--u)*11px);background:rgba(10,8,30,.6);border:1px solid var(--chalk);padding:0;cursor:pointer;font-size:calc(var(--u)*5.5px);line-height:1}
 #fsBtn{position:absolute;left:calc(var(--u)*20px);top:calc(var(--u)*30px);width:calc(var(--u)*11px);height:calc(var(--u)*11px);background:rgba(10,8,30,.6);border:1px solid var(--chalk);color:var(--chalk);font:900 calc(var(--u)*6px) var(--f-body);padding:0;cursor:pointer;line-height:1}
 #toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 24px);transform:translateX(-50%);z-index:30;max-width:calc(100% - 32px);box-sizing:border-box;background:#1d1840;border:2px solid var(--gold);color:var(--chalk);font:700 13px/1.5 var(--f-body);padding:10px 14px;text-align:center}
@@ -263,6 +266,7 @@ html.short .stat{gap:1px 6px}
   <button id="pauseBtn" type="button" aria-label="일시정지">II</button>
   <button id="fsBtn" type="button" aria-label="전체화면">⛶</button>
   <button id="sndBtn" type="button" aria-label="소리 켜기/끄기">🔊</button>
+  <button id="exitHud" class="exitBtn" type="button" aria-label="완전 종료">종료</button>
   <div id="pops"></div>
   <div class="combo" id="c1" hidden></div>
   <div class="combo" id="c2" hidden></div>
@@ -284,7 +288,7 @@ html.short .stat{gap:1px 6px}
 
 <div class="ov" id="selOv">
   <div class="card">
-    <div class="selHead"><span></span><div class="logo">복린이 대전<small>ROOKIE BOXING BATTLE</small></div><p class="credit"><span>v1.3</span><a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a></p></div>
+    <div class="selHead"><button class="exitBtn exitTop" type="button">완전 종료</button><div class="logo">복린이 대전<small>ROOKIE BOXING BATTLE</small></div><p class="credit"><span>v1.4</span><a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a></p></div>
     <div class="sel" id="sel"></div>
     <p class="help selhelp"><b>↓</b> 숙이면 펀치 회피 · <b>뒤로 당기기/가드</b> 막기 · 펀치 <b>이어 누르면 콤보</b> · 게이지 차면 <b>SUPER</b> · 3판 2선승</p>
     <button class="btn" id="goBtn" type="button">링 위로 올라가기</button>
@@ -336,6 +340,7 @@ html.short .stat{gap:1px 6px}
   <div class="card">
     <div class="logo" style="font-size:40px">일시정지</div>
     <div class="row">
+      <button class="btn ghost exitBtn" type="button">완전 종료</button>
       <button class="btn ghost" id="quitBtn" type="button">캐릭터 다시 고르기</button>
       <button class="btn" id="resumeBtn" type="button">계속하기</button>
     </div>
@@ -964,7 +969,7 @@ function makeCard(){
   x.fillText(win?'나랑 붙어볼 복서 구함 👊':'누가 대신 복수 좀 👊',540,1160);
   x.fillStyle='#151233';x.fillRect(0,1232,1080,120);
   x.font='700 34px "Noto Sans KR",sans-serif';x.fillStyle='#f6efe3';x.fillText('@nangman.boxer',540,1272);
-  x.font='26px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';x.fillText('dy747.github.io/bokrini-battle  ·  v1.3',540,1314);
+  x.font='26px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';x.fillText('dy747.github.io/bokrini-battle  ·  v1.4',540,1314);
   return C;
 }
 let shotFile=null;
@@ -1097,11 +1102,18 @@ function fsGuide(){
 showOri(); // the "open in Safari" guide is no longer shown; links from Instagram already open full-screen
 /* fresh start every time the link is opened again (Instagram keeps the closed page alive) */
 let hiddenAt=0;
-addEventListener('pageshow',e=>{if(e.persisted)location.reload();});
 document.addEventListener('visibilitychange',()=>{
-  if(document.hidden){hiddenAt=Date.now();if(mode==='fight'||mode==='intro'||mode==='end'){if(!paused){paused=true;bgm(false);$('pauseOv').hidden=false;}}}
-  else if(hiddenAt&&Date.now()-hiddenAt>1500)location.reload();
+  if(document.hidden&&(mode==='fight'||mode==='intro'||mode==='end')&&!paused){paused=true;bgm(false);$('pauseOv').hidden=false;}
 });
+/* 완전 종료: back to a fresh first screen, then try to close the in-app browser */
+function exitGame(){
+  try{sessionStorage.setItem('bk-exited','1')}catch(e){}
+  bgm(false);try{unlockEl&&unlockEl.pause()}catch(e){}
+  try{window.close()}catch(e){}
+  setTimeout(()=>location.reload(),150);
+}
+document.querySelectorAll('.exitBtn').forEach(b=>b.addEventListener('click',exitGame));
+try{if(sessionStorage.getItem('bk-exited')){sessionStorage.removeItem('bk-exited');setTimeout(()=>toast('종료했어요. 이제 위쪽 ✕ 를 눌러 닫으면 다음엔 처음부터 시작해요'),300);}}catch(e){}
 document.addEventListener('touchmove',e=>{if(!e.target.closest||!e.target.closest('.ov'))e.preventDefault();},{passive:false});
 ['gesturestart','gesturechange'].forEach(t=>document.addEventListener(t,e=>e.preventDefault()));
 document.querySelectorAll('#joy,.b').forEach(el=>el.addEventListener('touchstart',e=>e.preventDefault(),{passive:false}));
