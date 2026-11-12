@@ -284,6 +284,9 @@ html.port .endTxt{align-items:center}
 #endBtn{align-self:flex-start;min-width:0}
 html.port #endBtn{align-self:center}
 .b .n{font:400 clamp(20px,calc(var(--lh,1vh)*7),30px)/1 var(--f-display)}
+.pop.warn{font-size:calc(var(--u)*8.5px);line-height:1.15;color:#ff7080;white-space:pre-line;text-align:center;text-shadow:2px 0 0 #000,-2px 0 0 #000,0 2px 0 #000,0 -2px 0 #000,2px 2px 0 #000,0 0 8px #000;animation:rise 1.1s ease-out forwards}
+.pop.ok{font-size:calc(var(--u)*8px);color:#7dffa8}
+#ctl.tired .b[data-k=jab],#ctl.tired .b[data-k=straight],#ctl.tired .b[data-k=hook],#ctl.tired .b[data-k=upper]{opacity:.3;filter:grayscale(1)}
 .pop.cmb.sbk{font-size:calc(var(--u)*22px);color:#fff;text-shadow:calc(var(--u)*1px) calc(var(--u)*1px) 0 var(--gold),calc(var(--u)*2px) calc(var(--u)*2px) 0 var(--red),0 0 calc(var(--u)*10px) var(--gold)}
 .pop.cmb{font-size:calc(var(--u)*15px);color:var(--gold);text-shadow:calc(var(--u)*.8px) calc(var(--u)*.8px) 0 var(--red),0 0 calc(var(--u)*6px) rgba(255,59,85,.8);animation:cmb .9s ease-out forwards;z-index:2}
 @keyframes cmb{0%{opacity:0;transform:translate(-50%,-50%) scale(2.2) rotate(-6deg)}14%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(-6deg)}75%{opacity:1;transform:translate(-50%,-70%) scale(1) rotate(-6deg)}100%{opacity:0;transform:translate(-50%,-90%) scale(.9) rotate(-6deg)}}
@@ -349,7 +352,7 @@ html.port #endBtn{align-self:center}
 
 <div class="ov" id="selOv">
   <div class="card">
-    <div class="selHead"><div class="selLeft"><button class="exitBtn exitTop" type="button">완전 종료</button><p class="cnt" id="cnt" aria-live="polite"></p></div><div class="logo">복린이 대전<small>ROOKIE BOXING BATTLE</small></div><p class="credit"><span>v2.8</span><a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a></p></div>
+    <div class="selHead"><div class="selLeft"><button class="exitBtn exitTop" type="button">완전 종료</button><p class="cnt" id="cnt" aria-live="polite"></p></div><div class="logo">복린이 대전<small>ROOKIE BOXING BATTLE</small></div><p class="credit"><span>v2.9</span><a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a></p></div>
     <div class="sel" id="sel"></div>
     <p class="help selhelp"><b>뒤로+2</b> 또는 <b>백스텝→2</b> 쓱박 · 펀치마다 <b>스태미나</b> 소모, 가드·백스텝으로 회복 · 콤보 <b>1-1 · 1-2 · 1-어퍼 · 훅-훅 · 훅-2</b> … 숨은 기술도 찾아보세요</p>
     <button class="btn" id="goBtn" type="button">링 위로 올라가기</button>
@@ -742,6 +745,7 @@ const sfx={
   win(){[523,659,784,1047].forEach((f,i)=>osc(f,null,.14,'square',.22,sfxBus,i*.11));osc(1047,null,.55,'square',.2,sfxBus,.48);osc(784,null,.55,'square',.12,sfxBus,.48);},
   lose(){[392,370,349].forEach((f,i)=>osc(f,f*.97,.34,'triangle',.4,sfxBus,i*.38));osc(330,280,1.1,'triangle',.4,sfxBus,1.15);},
   sbak(){nz(.12,1800,.35,'bandpass',1.2,sfxBus,0,400);osc(90,30,.5,'sine',1.2,sfxBus,.08);nz(.2,900,.9,'lowpass',1,sfxBus,.08);nz(.08,7000,.5,'highpass',1,sfxBus,.08);[784,1175,1568].forEach((f,i)=>osc(f,null,.18,'square',.14,sfxBus,.16+i*.07));},
+  nope(){osc(160,120,.12,'square',.2);osc(160,120,.12,'square',.2,sfxBus,.15);},
   combo(n){osc(392,null,.08,'square',.16);osc(587,null,.08,'square',.16,sfxBus,.06);osc(n>2?988:784,null,.22,'square',.18,sfxBus,.12);nz(.12,5000,.2,'highpass',1,sfxBus,.12);},
   superStart(){osc(110,1760,.75,'sawtooth',.16);osc(220,1320,.75,'square',.06);nz(.75,600,.32,'bandpass',1,sfxBus,0,6000);
     [523,659,784,1047].forEach((f,i)=>osc(f,null,.55,'triangle',.13,sfxBus,.6+i*.03));nz(.35,8000,.4,'highpass',1,sfxBus,.75);osc(2600,1700,.3,'sine',.22,sfxBus,.75);},
@@ -796,7 +800,7 @@ function spark(x,y,kind){sparks.push({x,y,t:0,kind});}
 function scaled(m,spd){return Object.assign({},m,{s:Math.max(2,Math.round(m.s/spd)),r:Math.max(4,Math.round(m.r/spd))});}
 function canSlip(F,O){return O&&O.st==='attack'&&['jab','straight','upper','sbak'].includes(O.move)&&O.mf<O.md.s+O.md.a&&Math.abs(O.x-F.x)<=O.md.range+10;}
 function resolveMove(b,c,F,O){if(b==='super')return 'super';if(b==='bstep')return 'bstep';
-  if(F&&F.tired){if(F===P1&&F.anim-(F.tiredPop||-99)>40){F.tiredPop=F.anim;popAt('숨차!',F.x,GROUND-80,'mid');}return null;}
+  if(F&&F.tired){if(F===P1&&F.anim-(F.tiredPop||-99)>18){F.tiredPop=F.anim;popAt('스태미나 부족!\n가드·백스텝으로 회복',F.x,GROUND-88,'warn');sfx.nope();}return null;}
   if(b==='straight'&&F&&O&&F.anim-F.bsT<=20&&F.anim-O.atkStart<=26&&Math.abs(O.x-F.x)<=70)return 'sbak';
   if(b==='body')return 'body';
   if(b==='straight'&&F&&c.dir===-F.f&&canSlip(F,O))return 'sbak';if(c.down&&(b==='jab'||b==='straight'||b==='hook'))return 'body';return b;}
@@ -805,7 +809,7 @@ const COMBOS=[{s:['jab','straight','body'],n:'원투 바디',v:'원투 바디'},
   {s:['jab','hook'],n:'원 훅',v:'원 훅'},{s:['hook','hook'],n:'양훅',v:'양 훅'},{s:['jab','jab'],n:'잽잽',v:'잽 잽'},{s:['jab','straight'],n:'원투',v:'원 투'},
   {s:['jab','upper'],n:'원 어퍼',v:'원 어퍼'},{s:['hook','straight'],n:'훅 투',v:'훅 투'},{s:['hook','upper'],n:'훅 어퍼',v:'훅 어퍼'}];
 function matchCombo(seq){if(!seq||seq.length<2)return null;for(const c of COMBOS){const k=c.s.length;if(seq.length>=k&&c.s.every((m,i)=>seq[seq.length-k+i]===m))return c;}return null;}
-function startMove(F,mv){F.atkStart=F.anim;F.stam=Math.max(0,F.stam-(COST[mv]||9));if(F.stam<=0&&!F.tired){F.tired=true;popAt('숨차!',F.x,GROUND-80,'mid');}if(F.seqT!=null&&F.anim-F.seqT<=30)F.seq.push(mv);else F.seq=[mv];if(F.seq.length>4)F.seq.shift();F.seqT=F.anim;F.st='attack';F.move=mv;F.md=scaled(MOVES[mv],F.ch.spd);F.mf=0;F.hitDone=false;F.hitLanded=false;sfx.swing();}
+function startMove(F,mv){F.atkStart=F.anim;F.stam=Math.max(0,F.stam-(COST[mv]||9));if(F.stam<=0&&!F.tired){F.tired=true;if(F===P1){popAt('스태미나 부족!\n가드·백스텝으로 회복',F.x,GROUND-88,'warn');sfx.nope();}else popAt('숨차!',F.x,GROUND-80,'mid');}if(F.seqT!=null&&F.anim-F.seqT<=30)F.seq.push(mv);else F.seq=[mv];if(F.seq.length>4)F.seq.shift();F.seqT=F.anim;F.st='attack';F.move=mv;F.md=scaled(MOVES[mv],F.ch.spd);F.mf=0;F.hitDone=false;F.hitLanded=false;sfx.swing();}
 const AURA={nangman:'#3f7bff',gobong:'#d8262f',pigeon:'#3fbf8a',candy:'#ff4fb0'};
 let cutIn=null,rings=[],parts=[];
 function whiteFlash(){const f=$('wflash');f.classList.remove('on');void f.offsetWidth;f.classList.add('on');}
@@ -863,7 +867,7 @@ function updateFighter(F,O){
   const canAct=mode==='fight';
   { // stamina: refills while guarding / blocking / backstepping, slowly while idle
     const r={block:.55,blockstun:.55,bstep:.9,idle:.14,walk:.1,crouch:.14}[F.st]||0;F.stam=Math.min(F.stamMax,F.stam+r);
-    if(F.tired&&F.stam>=F.stamMax*.4){F.tired=false;}}
+    if(F.tired&&F.stam>=F.stamMax*.4){F.tired=false;if(F===P1){popAt('스태미나 회복!',F.x,GROUND-84,'ok');sfx.blip();}}}
   // reversal: answer an opponent's SUPER with your own SUPER -> the later one wins
   if(canAct&&F.buf==='super'&&F.sup>=100&&O.st==='super'&&!['super','ko'].includes(F.st)){F.buf=null;startSuper(F);return;}
   switch(F.st){
@@ -1083,7 +1087,7 @@ function hud(){
   el.h1.style.width=a+'%';el.d1.style.width=dr1+'%';el.h2.style.width=b+'%';el.d2.style.width=dr2+'%';
   el.h1.classList.toggle('low',a<30);el.h2.classList.toggle('low',b<30);
   el.s1.style.width=P1.sup+'%';el.s2.style.width=P2.sup+'%';
-  for(const [t,tb,F] of [[el.t1,el.tb1,P1],[el.t2,el.tb2,P2]]){const v=F.stam/F.stamMax*100;t.style.width=v+'%';tb.classList.toggle('tired',!!F.tired);tb.classList.toggle('low',!F.tired&&v<30);}
+  for(const [t,tb,F] of [[el.t1,el.tb1,P1],[el.t2,el.tb2,P2]]){const v=F.stam/F.stamMax*100;t.style.width=v+'%';tb.classList.toggle('tired',!!F.tired);if(F===P1)$('ctl').classList.toggle('tired',!!F.tired);tb.classList.toggle('low',!F.tired&&v<30);}
   el.sb1.classList.toggle('full',P1.sup>=100);el.sb2.classList.toggle('full',P2.sup>=100);
   el.sup.classList.toggle('ready',P1.sup>=100);
   el.t.textContent=Math.ceil(timer);
@@ -1348,7 +1352,7 @@ function makeChampCard(){
   T(ENDTXT[arc.ch.id].key,1195,'900 40px "Noto Sans KR",sans-serif','#ff4fb0');
   x.fillStyle='#151233';x.fillRect(0,1240,1080,110);
   T('@nangman.boxer',1278,'700 34px "Noto Sans KR",sans-serif','#f6efe3');
-  T('dy747.github.io/bokrini-battle  ·  v2.8',1318,'26px "Noto Sans KR",sans-serif','#a39cc9');
+  T('dy747.github.io/bokrini-battle  ·  v2.9',1318,'26px "Noto Sans KR",sans-serif','#a39cc9');
   return C;}
 
 let resScene=null;
@@ -1398,7 +1402,7 @@ function makeCard(){
   x.fillText(champ?'복린이 체육관 접수 완료 🏆':win?'나랑 붙어볼 복서 구함 👊':'누가 대신 복수 좀 👊',540,1160);
   x.fillStyle='#151233';x.fillRect(0,1232,1080,120);
   x.font='700 34px "Noto Sans KR",sans-serif';x.fillStyle='#f6efe3';x.fillText('@nangman.boxer',540,1272);
-  x.font='26px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';x.fillText('dy747.github.io/bokrini-battle  ·  v2.8',540,1314);
+  x.font='26px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';x.fillText('dy747.github.io/bokrini-battle  ·  v2.9',540,1314);
   return C;
 }
 let shotFile=null;
