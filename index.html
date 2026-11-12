@@ -168,6 +168,20 @@ html.port{}
 .stats div{background:var(--panel);border:2px solid var(--line);padding:8px 4px}
 .stats b{display:block;font:14px var(--f-px);color:var(--gold);margin-top:6px}
 .stats span{font-size:11px;color:var(--dim);font-weight:700}
+#resOv{overflow:hidden}
+#resOv>.card{margin:0 auto;height:100%;justify-content:center;gap:calc(var(--lh,1vh)*1.8)}
+#resOv .res-head{font-size:clamp(30px,calc(var(--lh,1vh)*9),60px)}
+#resOv .res-sub{font-size:clamp(11px,calc(var(--lh,1vh)*3),15px)}
+#resCv{height:clamp(80px,calc(var(--lh,1vh)*34),300px);width:auto;max-width:100%;aspect-ratio:200/96;image-rendering:pixelated;border:2px solid var(--line);flex:none}
+#resOv .stats div{padding:clamp(3px,calc(var(--lh,1vh)*1.2),8px) 4px}
+#resOv .stats b{margin-top:clamp(2px,calc(var(--lh,1vh)*1),6px);font-size:clamp(11px,calc(var(--lh,1vh)*3.4),14px)}
+#resOv .btn{padding-block:clamp(8px,calc(var(--lh,1vh)*2.4),13px)}
+.credit{margin:0;font-size:clamp(10px,calc(var(--lh,1vh)*2.4),12px);color:var(--dim);font-weight:700}
+.credit span{font-family:var(--f-px);font-size:.8em;color:var(--gold)}
+.credit a{color:var(--pink);text-decoration:none}
+#shotOv{z-index:30;background:rgba(7,6,15,.96)}
+#shotOv .card{height:100%;justify-content:center;gap:10px}
+#shotImg{max-width:100%;max-height:calc(var(--lh,1vh)*72);width:auto;height:auto;border:2px solid var(--line);-webkit-touch-callout:default;user-select:auto;-webkit-user-select:auto}
 #shareTxt{width:100%;max-width:520px;box-sizing:border-box;background:#05040c;color:var(--chalk);border:1px solid var(--line);font:500 12px var(--f-body);padding:8px;resize:none}
 .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
 .phone{width:46px;height:80px;border:4px solid var(--chalk);border-radius:8px;animation:rot 1.6s ease-in-out infinite}
@@ -265,6 +279,7 @@ html.port .sel{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:
         <div class="sel" id="sel"></div>
     <p class="help selhelp"><b>↓</b> 숙이면 펀치 회피 · <b>뒤로 당기기/가드</b> 막기 · 펀치 <b>이어 누르면 콤보</b> · 게이지 차면 <b>SUPER</b> · 3판 2선승</p>
     <button class="btn" id="goBtn" type="button">링 위로 올라가기</button>
+    <p class="credit"><span>v1.0</span> · 만든이 <a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a> (낭만.복서)</p>
   </div>
 </div>
 
@@ -272,10 +287,10 @@ html.port .sel{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:
   <div class="card">
     <div class="res-head" id="resHead">승리!</div>
     <div class="res-sub" id="resSub"></div>
+    <canvas id="resCv" width="200" height="96" aria-label="경기 결과 장면"></canvas>
     <div class="stats" id="stats"></div>
-    <textarea id="shareTxt" rows="3" readonly aria-label="공유 문구"></textarea>
     <div class="row">
-      <button class="btn ghost" id="copyBtn" type="button">결과 문구 복사</button>
+      <button class="btn ghost" id="saveBtn" type="button">📸 결과 이미지 저장</button>
       <button class="btn ghost" id="selBtn" type="button">캐릭터 다시 고르기</button>
       <button class="btn" id="againBtn" type="button">한 판 더</button>
     </div>
@@ -294,6 +309,17 @@ html.port .sel{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:
     <div class="row">
       <button class="btn ghost" id="oriPort" type="button">세로로 그냥 하기</button>
       <button class="btn" id="oriLand" type="button">가로로 하기</button>
+    </div>
+  </div>
+</div>
+
+<div class="ov" id="shotOv" hidden>
+  <div class="card">
+    <img id="shotImg" alt="경기 결과 이미지">
+    <p class="note" id="shotHint">이미지를 <b>길게 눌러</b> '사진에 저장'을 누르세요</p>
+    <div class="row">
+      <button class="btn ghost" id="shotClose" type="button">닫기</button>
+      <button class="btn" id="shotShare" type="button">저장 / 공유하기</button>
     </div>
   </div>
 </div>
@@ -859,6 +885,7 @@ function frame(ts){
   while(acc>=1/60){step();acc-=1/60;selAnim++;}
   render();hud();
   if(mode==='select')drawSelect();
+  if(mode==='result')drawResult();
   requestAnimationFrame(frame);
 }
 
@@ -891,15 +918,64 @@ function showResult(){
   $('resSub').textContent=`${P1.ch.name} ${P1.wins} : ${P2.wins} ${P2.ch.name}`;
   const s=P1.stats;
   $('stats').innerHTML=`<div><span>최대 콤보</span><b>${s.max}</b></div><div><span>카운터</span><b>${s.counters}</b></div><div><span>필살기</span><b>${s.supers}</b></div><div><span>준 데미지</span><b>${s.dealt}</b></div>`;
-  $('shareTxt').value=win
-    ?`🥊 복린이 대전\n${P1.ch.name}로 ${P2.ch.name} ${P1.wins}:${P2.wins} 격파! 최대 ${s.max}콤보 · 카운터 ${s.counters}회\n나랑 붙어볼 복서 구함 👊`
-    :`🥊 복린이 대전\n${P1.ch.name}로 붙었다가 ${P2.ch.name}한테 ${P1.wins}:${P2.wins}로 졌다…\n누가 대신 복수 좀 👊`;
-  $('copyBtn').textContent='결과 문구 복사';
+  resScene={a:{ch:P1.ch,st:win?'win':'cry',anim:0,f:1,ctrl:{},y:0,mf:0,walkT:0},b:{ch:P2.ch,st:win?'cry':'win',anim:40,f:-1,ctrl:{},y:0,mf:0,walkT:0},win};
   $('resOv').hidden=false;
 }
-function toSelect(){bgm(false);mode='select';paused=false;P1=null;['resOv','pauseOv'].forEach(id=>$(id).hidden=true);$('ctl').hidden=true;$('selOv').hidden=false;clearCallout();$('pops').innerHTML='';}
+let resScene=null;
+function drawScene(c,ox,oy){ // 200x96 scene: P1 left, P2 right
+  c.save();c.beginPath();c.rect(ox,oy,200,96);c.clip();
+  c.drawImage(bg,60,66,200,96,ox,oy,200,96);
+  c.fillStyle='rgba(7,6,15,.25)';c.fillRect(ox,oy,200,96);
+  for(const [F,x] of [[resScene.a,70],[resScene.b,130]]){
+    F.y=F.st==='win'?-Math.abs(Math.sin(F.anim*.18))*6:0;
+    c.fillStyle='rgba(0,0,0,.4)';c.fillRect(ox+x-12,oy+91,24,3);
+    drawFighter(c,F,ox+x,oy+92+F.y);
+  }
+  c.restore();
+}
+function drawResult(){
+  if(!resScene)return;resScene.a.anim++;resScene.b.anim++;
+  const c=$('resCv').getContext('2d');c.imageSmoothingEnabled=false;c.setTransform(1,0,0,1,0,0);drawScene(c,0,0);
+}
+function makeCard(){
+  const S=4,L=document.createElement('canvas');L.width=270;L.height=338;const l=L.getContext('2d');l.imageSmoothingEnabled=false;
+  l.fillStyle='#07060f';l.fillRect(0,0,270,338);
+  l.save();l.translate(35,92);drawScene(l,0,0);l.restore();
+  const C=document.createElement('canvas');C.width=1080;C.height=1352;const x=C.getContext('2d');x.imageSmoothingEnabled=false;
+  x.drawImage(L,0,0,1080,1352);
+  x.strokeStyle='#3a3270';x.lineWidth=8;x.strokeRect(140,368,800,384);
+  const win=resScene.win,s=P1.stats;x.textAlign='center';x.textBaseline='middle';
+  const T=(t,y,sz,col,font='"Black Han Sans","Noto Sans KR",sans-serif',sh)=>{x.font=`${sz}px ${font}`;if(sh){x.fillStyle=sh;x.fillText(t,540+6,y+6);}x.fillStyle=col;x.fillText(t,540,y);};
+  T('ROOKIE BOXING BATTLE',96,30,'#ffd23a','"Press Start 2P",monospace');
+  T('복린이 대전',200,130,'#f6efe3',undefined,'#ff3b55');
+  T(win?'승리!':'패배…',870,150,win?'#ffd23a':'#a39cc9',undefined,win?'#ff3b55':'#000');
+  T(`${P1.ch.name}  ${P1.wins} : ${P2.wins}  ${P2.ch.name}`,990,54,'#f6efe3','700 "Noto Sans KR",sans-serif'.replace('700 ',''));
+  x.font='700 36px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';
+  x.fillText(`최대 ${s.max}콤보 · 카운터 ${s.counters} · 필살기 ${s.supers} · 데미지 ${s.dealt}`,540,1070);
+  x.font='900 46px "Noto Sans KR",sans-serif';x.fillStyle='#ff4fb0';
+  x.fillText(win?'나랑 붙어볼 복서 구함 👊':'누가 대신 복수 좀 👊',540,1160);
+  x.fillStyle='#151233';x.fillRect(0,1232,1080,120);
+  x.font='700 34px "Noto Sans KR",sans-serif';x.fillStyle='#f6efe3';x.fillText('@nangman.boxer',540,1272);
+  x.font='26px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';x.fillText('dy747.github.io/bokrini-battle  ·  v1.0',540,1314);
+  return C;
+}
+let shotFile=null;
+$('saveBtn').addEventListener('click',()=>{
+  if(!resScene)return;
+  const C=makeCard();const url=C.toDataURL('image/png');$('shotImg').src=url;shotFile=null;
+  try{C.toBlob(b=>{if(b)shotFile=new File([b],'bokrini-battle.png',{type:'image/png'});},'image/png');}catch(e){}
+  $('shotHint').innerHTML=isIOS?"이미지를 <b>길게 눌러</b> '사진에 저장'을 누르세요":"아래 <b>저장 / 공유하기</b>를 누르거나 이미지를 길게 눌러 저장하세요";
+  $('shotOv').hidden=false;
+});
+$('shotClose').addEventListener('click',()=>{$('shotOv').hidden=true;});
+$('shotShare').addEventListener('click',async()=>{
+  try{if(shotFile&&navigator.canShare&&navigator.canShare({files:[shotFile]})){await navigator.share({files:[shotFile],title:'복린이 대전'});return;}}catch(e){if(e&&e.name==='AbortError')return;}
+  try{const a=document.createElement('a');a.href=$('shotImg').src;a.download='bokrini-battle.png';document.body.appendChild(a);a.click();a.remove();}catch(e){}
+  toast(isIOS?"이미지를 길게 눌러 '사진에 저장'을 누르세요":'저장이 안 되면 이미지를 길게 눌러 저장하세요');
+});
+function toSelect(){resScene=null;$('shotOv').hidden=true;bgm(false);mode='select';paused=false;P1=null;['resOv','pauseOv'].forEach(id=>$(id).hidden=true);$('ctl').hidden=true;$('selOv').hidden=false;clearCallout();$('pops').innerHTML='';}
 $('goBtn').addEventListener('click',()=>{ensureAudio();startMatch();});
-$('againBtn').addEventListener('click',()=>{ensureAudio();startMatch();});
+$('againBtn').addEventListener('click',()=>{resScene=null;$('shotOv').hidden=true;ensureAudio();startMatch();});
 $('selBtn').addEventListener('click',toSelect);
 $('quitBtn').addEventListener('click',toSelect);
 const isIOS=/iP(hone|od|ad)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -916,9 +992,7 @@ setMute(muted);
 $('fsBtn').addEventListener('click',()=>{if(document.fullscreenElement){document.exitFullscreen&&document.exitFullscreen();return;}goFull(orient==='land');});
 $('pauseBtn').addEventListener('click',()=>{if(mode==='select'||mode==='result')return;paused=true;bgm(false);$('pauseOv').hidden=false;});
 $('resumeBtn').addEventListener('click',()=>{paused=false;bgm(true);$('pauseOv').hidden=true;});
-$('copyBtn').addEventListener('click',()=>{const ta=$('shareTxt'),btn=$('copyBtn');
-  const fb=()=>{ta.focus();ta.select();btn.textContent='길게 눌러 복사하세요';};
-  try{navigator.clipboard.writeText(ta.value).then(()=>btn.textContent='복사됨!',fb);}catch(e){fb();}});
+
 
 /* ================= input ================= */
 const inp={dir:0,down:false,guard:false,press:null};
