@@ -113,6 +113,8 @@ body{margin:0;background:var(--bg);color:var(--chalk);font-family:var(--f-body);
 #joy::before{border-right-color:rgba(255,255,255,.7);transform:translate(calc(-50% - clamp(36px,calc(var(--lh,1vh) * 11),52px)),-50%)}
 #joy::after{border-left-color:rgba(255,255,255,.7);transform:translate(calc(-50% + clamp(36px,calc(var(--lh,1vh) * 11),52px)),-50%)}
 #joy{opacity:.38;transition:opacity .15s}
+/* rotated on a portrait phone: keep the joystick clear of the in-app browser's floating close button (physical top-left) */
+html.rot #joy{left:110px}
 #joy.on{opacity:.8}
 #knob{position:absolute;left:50%;top:50%;width:42%;aspect-ratio:1;border-radius:50%;transform:translate(-50%,-50%);
   background:radial-gradient(circle at 35% 30%,#e9ecff,#7f86b5 60%,#3b3f66);box-shadow:0 3px 8px rgba(0,0,0,.6)}
@@ -282,7 +284,7 @@ html.short .stat{gap:1px 6px}
 
 <div class="ov" id="selOv">
   <div class="card">
-    <div class="selHead"><span></span><div class="logo">복린이 대전<small>ROOKIE BOXING BATTLE</small></div><p class="credit"><span>v1.1</span><a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a></p></div>
+    <div class="selHead"><span></span><div class="logo">복린이 대전<small>ROOKIE BOXING BATTLE</small></div><p class="credit"><span>v1.2</span><a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a></p></div>
     <div class="sel" id="sel"></div>
     <p class="help selhelp"><b>↓</b> 숙이면 펀치 회피 · <b>뒤로 당기기/가드</b> 막기 · 펀치 <b>이어 누르면 콤보</b> · 게이지 차면 <b>SUPER</b> · 3판 2선승</p>
     <button class="btn" id="goBtn" type="button">링 위로 올라가기</button>
@@ -962,7 +964,7 @@ function makeCard(){
   x.fillText(win?'나랑 붙어볼 복서 구함 👊':'누가 대신 복수 좀 👊',540,1160);
   x.fillStyle='#151233';x.fillRect(0,1232,1080,120);
   x.font='700 34px "Noto Sans KR",sans-serif';x.fillStyle='#f6efe3';x.fillText('@nangman.boxer',540,1272);
-  x.font='26px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';x.fillText('dy747.github.io/bokrini-battle  ·  v1.1',540,1314);
+  x.font='26px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';x.fillText('dy747.github.io/bokrini-battle  ·  v1.2',540,1314);
   return C;
 }
 let shotFile=null;
