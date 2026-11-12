@@ -284,7 +284,7 @@ html.short .stat{gap:1px 6px}
 
 <div class="ov" id="selOv">
   <div class="card">
-    <div class="selHead"><span></span><div class="logo">복린이 대전<small>ROOKIE BOXING BATTLE</small></div><p class="credit"><span>v1.2</span><a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a></p></div>
+    <div class="selHead"><span></span><div class="logo">복린이 대전<small>ROOKIE BOXING BATTLE</small></div><p class="credit"><span>v1.3</span><a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a></p></div>
     <div class="sel" id="sel"></div>
     <p class="help selhelp"><b>↓</b> 숙이면 펀치 회피 · <b>뒤로 당기기/가드</b> 막기 · 펀치 <b>이어 누르면 콤보</b> · 게이지 차면 <b>SUPER</b> · 3판 2선승</p>
     <button class="btn" id="goBtn" type="button">링 위로 올라가기</button>
@@ -964,7 +964,7 @@ function makeCard(){
   x.fillText(win?'나랑 붙어볼 복서 구함 👊':'누가 대신 복수 좀 👊',540,1160);
   x.fillStyle='#151233';x.fillRect(0,1232,1080,120);
   x.font='700 34px "Noto Sans KR",sans-serif';x.fillStyle='#f6efe3';x.fillText('@nangman.boxer',540,1272);
-  x.font='26px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';x.fillText('dy747.github.io/bokrini-battle  ·  v1.2',540,1314);
+  x.font='26px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';x.fillText('dy747.github.io/bokrini-battle  ·  v1.3',540,1314);
   return C;
 }
 let shotFile=null;
@@ -1035,7 +1035,7 @@ addEventListener('keyup',e=>{keys.delete(e.key.toLowerCase());syncInp();});
 addEventListener('blur',()=>{keys.clear();btnGuard=0;syncInp();});
 
 /* ================= sizing / rotation ================= */
-let orient='port';try{orient=localStorage.getItem('bk-orient')||'port'}catch(e){}
+let orient='port';try{localStorage.removeItem('bk-orient')}catch(e){}
 let ROT=false;
 function fit(){
   const rw=innerWidth,rh=innerHeight;ROT=orient==='land'&&rh>rw&&$('oriOv').hidden&&$('fsOv').hidden;
@@ -1053,7 +1053,7 @@ function fit(){
   de.style.setProperty('--u',(Math.min(cw,bw*1.0)/320).toFixed(3));
   gm.style.top=portrait?Math.round(Math.max(bh/2+50,vh*.33))+'px':'50%';
 }
-function setOrient(o){orient=o;try{localStorage.setItem('bk-orient',o)}catch(e){}fit();}
+function setOrient(o){orient=o;fit();}
 function oriPick(o,e){if(e)e.preventDefault();if($('oriOv').hidden)return;$('oriOv').hidden=true;ensureAudio();setOrient(o);if(!isIOS)goFull(o==='land');}
 for(const [id,o] of [['oriPort','port'],['oriLand','land']]){const b=$(id);b.addEventListener('click',e=>oriPick(o,e));b.addEventListener('pointerup',e=>oriPick(o,e));}
 /* ---- full-screen guide for beginners ---- */
@@ -1094,7 +1094,14 @@ function fsGuide(){
   c.innerHTML=h;$('fsOv').hidden=false;
   $('fsSkip').addEventListener('click',closeFs);
 }
-fsGuide();
+showOri(); // the "open in Safari" guide is no longer shown; links from Instagram already open full-screen
+/* fresh start every time the link is opened again (Instagram keeps the closed page alive) */
+let hiddenAt=0;
+addEventListener('pageshow',e=>{if(e.persisted)location.reload();});
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){hiddenAt=Date.now();if(mode==='fight'||mode==='intro'||mode==='end'){if(!paused){paused=true;bgm(false);$('pauseOv').hidden=false;}}}
+  else if(hiddenAt&&Date.now()-hiddenAt>1500)location.reload();
+});
 document.addEventListener('touchmove',e=>{if(!e.target.closest||!e.target.closest('.ov'))e.preventDefault();},{passive:false});
 ['gesturestart','gesturechange'].forEach(t=>document.addEventListener(t,e=>e.preventDefault()));
 document.querySelectorAll('#joy,.b').forEach(el=>el.addEventListener('touchstart',e=>e.preventDefault(),{passive:false}));
