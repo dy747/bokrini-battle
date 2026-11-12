@@ -63,6 +63,12 @@ body{margin:0;background:var(--bg);color:var(--chalk);font-family:var(--f-body);
 .sp{display:flex;align-items:center;gap:calc(var(--u)*2px);width:100%}
 .pl.r .sp{flex-direction:row-reverse}
 .sp span{font-family:var(--f-px);font-size:calc(var(--u)*3.6px);color:#7fb4ff}
+.tbar{flex:1;max-width:calc(var(--u)*76px);height:calc(var(--u)*4px);background:#06200f;border:1px solid #2fa060;overflow:hidden;position:relative}
+.tbar i{position:absolute;top:0;bottom:0;left:0;background:linear-gradient(#7dffa8,#2fc46a)}
+.pl.r .tbar i{left:auto;right:0}
+.sp.st span{color:#7dffa8}
+.tbar.low i{background:linear-gradient(#ffe07a,#f0a020)}
+.tbar.tired{border-color:var(--red)}.tbar.tired i{background:var(--red);animation:glow .3s steps(2) infinite}
 .sbar{flex:1;max-width:calc(var(--u)*60px);height:calc(var(--u)*3px);background:#0b1030;border:1px solid #4a63b8;overflow:hidden;position:relative}
 .sbar i{position:absolute;top:0;bottom:0;left:0;background:#46a0ff}
 .pl.r .sbar i{left:auto;right:0}
@@ -74,7 +80,7 @@ body{margin:0;background:var(--bg);color:var(--chalk);font-family:var(--f-body);
 .mid{text-align:center;line-height:1;padding-top:calc(var(--u)*1px)}
 .mid small{display:block;font-family:var(--f-px);font-size:calc(var(--u)*3.6px);color:var(--chalk)}
 .mid span{font-family:var(--f-px);font-size:calc(var(--u)*11px);color:var(--gold);text-shadow:0 calc(var(--u)*1px) 0 #8a3d00;display:block;margin-top:calc(var(--u)*2px);font-variant-numeric:tabular-nums}
-#exitHud{position:absolute;left:calc(var(--u)*48px);top:calc(var(--u)*30px);height:calc(var(--u)*11px);padding:0 calc(var(--u)*3px);background:rgba(60,10,20,.7);border:1px solid var(--red);color:#fff;font:900 calc(var(--u)*5px) var(--f-body);cursor:pointer}
+#exitHud{position:absolute;left:calc(var(--u)*48px);top:calc(var(--u)*35px);height:calc(var(--u)*11px);padding:0 calc(var(--u)*3px);background:rgba(60,10,20,.7);border:1px solid var(--red);color:#fff;font:900 calc(var(--u)*5px) var(--f-body);cursor:pointer}
 .exitBtn.exitTop{justify-self:start;align-self:start;white-space:nowrap;width:max-content;height:auto;min-width:0;line-height:1.2;background:transparent;border:2px solid var(--red);color:#ff8a96;font:900 13px var(--f-body);padding:7px 12px;cursor:pointer}
 html.port .exitBtn.exitTop{padding:3px 9px;font-size:11px}
 .selLeft{justify-self:start;align-self:start;display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-width:0;position:relative;z-index:2}
@@ -87,10 +93,10 @@ html.port .cnt i{font-style:normal;padding:0 3px}
 .cnt u{text-decoration:none}
 html.port .cnt u{display:none}
 html.port .cnt i{display:inline}
-#sndBtn{position:absolute;left:calc(var(--u)*34px);top:calc(var(--u)*30px);width:calc(var(--u)*11px);height:calc(var(--u)*11px);background:rgba(10,8,30,.6);border:1px solid var(--chalk);padding:0;cursor:pointer;font-size:calc(var(--u)*5.5px);line-height:1}
-#fsBtn{position:absolute;left:calc(var(--u)*20px);top:calc(var(--u)*30px);width:calc(var(--u)*11px);height:calc(var(--u)*11px);background:rgba(10,8,30,.6);border:1px solid var(--chalk);color:var(--chalk);font:900 calc(var(--u)*6px) var(--f-body);padding:0;cursor:pointer;line-height:1}
+#sndBtn{position:absolute;left:calc(var(--u)*34px);top:calc(var(--u)*35px);width:calc(var(--u)*11px);height:calc(var(--u)*11px);background:rgba(10,8,30,.6);border:1px solid var(--chalk);padding:0;cursor:pointer;font-size:calc(var(--u)*5.5px);line-height:1}
+#fsBtn{position:absolute;left:calc(var(--u)*20px);top:calc(var(--u)*35px);width:calc(var(--u)*11px);height:calc(var(--u)*11px);background:rgba(10,8,30,.6);border:1px solid var(--chalk);color:var(--chalk);font:900 calc(var(--u)*6px) var(--f-body);padding:0;cursor:pointer;line-height:1}
 #toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 24px);transform:translateX(-50%);z-index:30;max-width:calc(100% - 32px);box-sizing:border-box;background:#1d1840;border:2px solid var(--gold);color:var(--chalk);font:700 13px/1.5 var(--f-body);padding:10px 14px;text-align:center}
-#pauseBtn{position:absolute;left:calc(var(--u)*6px);top:calc(var(--u)*30px);width:calc(var(--u)*11px);height:calc(var(--u)*11px);
+#pauseBtn{position:absolute;left:calc(var(--u)*6px);top:calc(var(--u)*35px);width:calc(var(--u)*11px);height:calc(var(--u)*11px);
   background:rgba(10,8,30,.6);border:1px solid var(--chalk);color:var(--chalk);font:900 calc(var(--u)*5px) var(--f-body);padding:0;cursor:pointer;pointer-events:auto}
 
 #pops{position:absolute;inset:0;pointer-events:none;overflow:hidden}
@@ -137,7 +143,7 @@ html.rot #btns{right:calc(env(safe-area-inset-bottom,0px) + 6px);bottom:calc(env
 #knob{position:absolute;left:50%;top:50%;width:42%;aspect-ratio:1;border-radius:50%;transform:translate(-50%,-50%);
   background:radial-gradient(circle at 35% 30%,#e9ecff,#7f86b5 60%,#3b3f66);box-shadow:0 3px 8px rgba(0,0,0,.6)}
 #btns{position:absolute;right:max(14px,calc(env(safe-area-inset-right,0px) + 8px));bottom:calc(env(safe-area-inset-bottom,0px) + 10px);
-  display:grid;grid-template-areas:'g j s x' 'g h u b';grid-template-columns:repeat(4,clamp(48px,calc(var(--lh,1vh) * 15),66px));grid-auto-rows:clamp(48px,calc(var(--lh,1vh) * 15),66px);gap:clamp(6px,calc(var(--lh,1vh) * 2),10px);pointer-events:none}
+  display:grid;grid-template-areas:'g j s x' 'k h u b';grid-template-columns:repeat(4,clamp(48px,calc(var(--lh,1vh) * 15),66px));grid-auto-rows:clamp(48px,calc(var(--lh,1vh) * 15),66px);gap:clamp(6px,calc(var(--lh,1vh) * 2),10px);pointer-events:none}
 .b{pointer-events:auto;touch-action:none;border-radius:50%;border:2px solid;display:grid;place-items:center;
   font:900 clamp(11px,calc(var(--lh,1vh) * 3.4),14px)/1.1 var(--f-body);color:#fff;text-align:center;cursor:pointer;padding:0;
   background:rgba(14,10,36,.62);box-shadow:inset 0 0 10px rgba(0,0,0,.6)}
@@ -152,7 +158,7 @@ html.rot #btns{right:calc(env(safe-area-inset-bottom,0px) + 6px);bottom:calc(env
 html.port{}
 @media all{
   html.port #joy{width:min(124px,29vw);bottom:calc(env(safe-area-inset-bottom,0px) + 40px)}
-  html.port #btns{grid-template-areas:'g j s x' 'g h u b';grid-template-columns:repeat(4,min(56px,13.4vw));grid-auto-rows:min(56px,13.4vw);gap:min(7px,1.8vw);bottom:calc(env(safe-area-inset-bottom,0px) + 30px)}
+  html.port #btns{grid-template-areas:'g j s x' 'k h u b';grid-template-columns:repeat(4,min(56px,13.4vw));grid-auto-rows:min(56px,13.4vw);gap:min(7px,1.8vw);bottom:calc(env(safe-area-inset-bottom,0px) + 30px)}
 }
 
 /* Overlays */
@@ -254,7 +260,7 @@ html.short .ch em,html.short .sname{display:none}
 html.short .stat{gap:1px 6px}
 #goBtn{flex:none;padding-block:clamp(8px,calc(var(--lh,1vh)*2.4),13px)}
 
-#btns .b[data-k=guard]{align-self:center;width:100%;aspect-ratio:1;height:auto}
+.b.bk{border-color:#9aa3c9;font-size:clamp(9px,calc(var(--lh,1vh) * 2.9),12px)}
 .b.bd{border-color:#ff9a3a;box-shadow:0 0 8px rgba(255,154,58,.55),inset 0 0 10px rgba(255,154,58,.25)}
 /* joystick: lower and smaller so it covers less; while held, the ring nearly vanishes and only the knob shows */
 #joy{left:max(16px,calc(env(safe-area-inset-left,0px) + 10px));bottom:calc(env(safe-area-inset-bottom,0px) + 2px);width:clamp(96px,calc(var(--lh,1vh) * 30),136px)}
@@ -277,6 +283,7 @@ html.port .endTxt{align-items:center}
 #endBtn{align-self:flex-start;min-width:0}
 html.port #endBtn{align-self:center}
 .b .n{font:400 clamp(20px,calc(var(--lh,1vh)*7),30px)/1 var(--f-display)}
+.pop.cmb.sbk{font-size:calc(var(--u)*22px);color:#fff;text-shadow:calc(var(--u)*1px) calc(var(--u)*1px) 0 var(--gold),calc(var(--u)*2px) calc(var(--u)*2px) 0 var(--red),0 0 calc(var(--u)*10px) var(--gold)}
 .pop.cmb{font-size:calc(var(--u)*15px);color:var(--gold);text-shadow:calc(var(--u)*.8px) calc(var(--u)*.8px) 0 var(--red),0 0 calc(var(--u)*6px) rgba(255,59,85,.8);animation:cmb .9s ease-out forwards;z-index:2}
 @keyframes cmb{0%{opacity:0;transform:translate(-50%,-50%) scale(2.2) rotate(-6deg)}14%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(-6deg)}75%{opacity:1;transform:translate(-50%,-70%) scale(1) rotate(-6deg)}100%{opacity:0;transform:translate(-50%,-90%) scale(.9) rotate(-6deg)}}
 #wflash{position:absolute;inset:0;pointer-events:none;background:#fff;opacity:0}
@@ -300,6 +307,7 @@ html.port #endBtn{align-self:center}
         <div class="nm"><b>1P</b><span id="n1">낭만복서</span></div>
         <div class="hp"><i class="drain" id="d1"></i><i class="fill" id="h1"></i></div>
         <div class="sp"><span>SUPER</span><div class="sbar" id="sb1"><i id="s1"></i></div><div class="dots" id="w1"><i></i><i></i></div></div>
+        <div class="sp st"><span>STAMINA</span><div class="tbar" id="tb1"><i id="t1"></i></div></div>
       </div>
     </div>
     <div class="mid"><small>TIME</small><span id="time">60</span></div>
@@ -309,6 +317,7 @@ html.port #endBtn{align-self:center}
         <div class="nm"><span id="n2">고봉식씨</span><b>CPU</b></div>
         <div class="hp"><i class="drain" id="d2"></i><i class="fill" id="h2"></i></div>
         <div class="sp"><span>SUPER</span><div class="sbar" id="sb2"><i id="s2"></i></div><div class="dots" id="w2"><i></i><i></i></div></div>
+        <div class="sp st"><span>STAMINA</span><div class="tbar" id="tb2"><i id="t2"></i></div></div>
       </div>
     </div>
   </div>
@@ -328,6 +337,7 @@ html.port #endBtn{align-self:center}
   <div id="joy" aria-label="이동 조이스틱"><div id="knob"></div></div>
   <div id="btns">
     <button class="b gd" data-k="guard" style="grid-area:g" type="button">가드<small>U</small></button>
+    <button class="b bk" data-k="bstep" style="grid-area:k" type="button">백스텝<small>H</small></button>
     <button class="b bl" data-k="jab" style="grid-area:j" type="button"><span class="n">1</span><small>J</small></button>
     <button class="b bl" data-k="straight" style="grid-area:s" type="button"><span class="n">2</span><small>K</small></button>
     <button class="b rd" data-k="hook" style="grid-area:h" type="button">훅<small>L</small></button>
@@ -339,9 +349,9 @@ html.port #endBtn{align-self:center}
 
 <div class="ov" id="selOv">
   <div class="card">
-    <div class="selHead"><div class="selLeft"><button class="exitBtn exitTop" type="button">완전 종료</button><p class="cnt" id="cnt" aria-live="polite"></p></div><div class="logo">복린이 대전<small>ROOKIE BOXING BATTLE</small></div><p class="credit"><span>v2.5</span><a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a></p></div>
+    <div class="selHead"><div class="selLeft"><button class="exitBtn exitTop" type="button">완전 종료</button><p class="cnt" id="cnt" aria-live="polite"></p></div><div class="logo">복린이 대전<small>ROOKIE BOXING BATTLE</small></div><p class="credit"><span>v2.6</span><a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a></p></div>
     <div class="sel" id="sel"></div>
-    <p class="help selhelp"><b>뒤로+2</b> 쓱박 · <b>1-1 · 1-2 · 1-훅 · 1-어퍼 · 훅-훅 · 1-바디 · 1-2-바디 · 어퍼-바디 · 바디-어퍼</b></p>
+    <p class="help selhelp"><b>뒤로+2</b> 또는 <b>백스텝→2</b> 쓱박 · 펀치마다 <b>스태미나</b> 소모, 가드·백스텝으로 회복 · 콤보 <b>1-1 · 1-2 · 1-훅 · 훅-훅 · 1-바디 …</b></p>
     <button class="btn" id="goBtn" type="button">링 위로 올라가기</button>
   </div>
 </div>
@@ -450,7 +460,7 @@ const MOVES={
  hook:    {s:7, a:4,r:15,dmg:12,range:38,hs:20,kb:4.5,high:true, gain:10,cancel:['hook','straight','upper','body'],big:true,lunge:1.4,sy:52},
  upper:   {s:7, a:4,r:18,dmg:14,range:34,hs:26,kb:2.2,high:false,gain:11,cancel:['body'],big:true,lunge:1.1,launch:-3.4,sy:58},
  body:    {s:7, a:3,r:13,dmg:8, range:40,hs:17,kb:1.6,high:false,gain:9, cancel:['straight','hook','upper'],lunge:1.8},
- sbak:    {s:6, a:3,r:12,dmg:12,range:50,hs:20,kb:3.5,high:true, gain:12,cancel:['hook','body','upper'],big:true,slip:true},
+ sbak:    {s:6, a:3,r:12,dmg:15,range:52,hs:24,kb:4,  high:true, gain:12,cancel:['hook','body','upper'],big:true,slip:true,lunge:2.6},
 };
 const SUPERS={
  rush:{dur:56,adv:1.4,hits:[[12,5,38,1,14],[19,5,38,1,14],[26,5,38,1,14],[33,5,38,1,14],[44,14,42,6,32]]},
@@ -551,6 +561,7 @@ function pose(F){
   switch(F.st){
     case 'walk':p.step=Math.sin(F.walkT*.25)*4;break;
     case 'crouch':p.cr=10;p.fr=[12,-47];p.rr=[8,-45];break;
+    case 'bstep':p.lean=-4;p.step=-3;p.cr=2;p.fr=[11,-53];p.rr=[9,-48];break;
     case 'block':case 'blockstun':p.cr=F.ctrl&&F.ctrl.down?10:2;p.fr=[11,-53];p.rr=[10,-47];break;
     case 'hitstun':
       if(F.hitBy==='upper'){p.lean=-6;p.fr=[6,-60];p.rr=[1,-58];p.tilt=-2;}
@@ -730,6 +741,7 @@ const sfx={
   champ(){const N=[[523,0,.12],[523,.13,.12],[523,.26,.12],[659,.4,.5],[587,.95,.18],[659,1.15,.18],[784,1.35,.9]];N.forEach(([f,at,d])=>{osc(f,null,d,'square',.24,sfxBus,at);osc(f/2,null,d,'triangle',.2,sfxBus,at);});[0,.4,1.35].forEach(at=>nz(.2,6000,.25,'highpass',1,sfxBus,at));this.crowd();},
   win(){[523,659,784,1047].forEach((f,i)=>osc(f,null,.14,'square',.22,sfxBus,i*.11));osc(1047,null,.55,'square',.2,sfxBus,.48);osc(784,null,.55,'square',.12,sfxBus,.48);},
   lose(){[392,370,349].forEach((f,i)=>osc(f,f*.97,.34,'triangle',.4,sfxBus,i*.38));osc(330,280,1.1,'triangle',.4,sfxBus,1.15);},
+  sbak(){nz(.12,1800,.35,'bandpass',1.2,sfxBus,0,400);osc(90,30,.5,'sine',1.2,sfxBus,.08);nz(.2,900,.9,'lowpass',1,sfxBus,.08);nz(.08,7000,.5,'highpass',1,sfxBus,.08);[784,1175,1568].forEach((f,i)=>osc(f,null,.18,'square',.14,sfxBus,.16+i*.07));},
   combo(n){osc(392,null,.08,'square',.16);osc(587,null,.08,'square',.16,sfxBus,.06);osc(n>2?988:784,null,.22,'square',.18,sfxBus,.12);nz(.12,5000,.2,'highpass',1,sfxBus,.12);},
   superStart(){osc(110,1760,.75,'sawtooth',.16);osc(220,1320,.75,'square',.06);nz(.75,600,.32,'bandpass',1,sfxBus,0,6000);
     [523,659,784,1047].forEach((f,i)=>osc(f,null,.55,'triangle',.13,sfxBus,.6+i*.03));nz(.35,8000,.4,'highpass',1,sfxBus,.75);osc(2600,1700,.3,'sine',.22,sfxBus,.75);},
@@ -766,7 +778,9 @@ function buzz(ms){try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}}
 /* ================= state ================= */
 let mode='select',paused=false,round=1,timer=60,introT=0,endT=0,hitstop=0,superFreeze=0,shake=0,projs=[],sparks=[],rWin=null;
 let pick=0,P1,P2,lastAtk=null;
-function newFighter(ch,x,f,cpu){return{ch,x,y:0,vx:0,vy:0,f,hp:ch.hp,sup:0,st:'idle',t:0,mf:0,md:null,move:null,anim:0,walkT:0,koT:0,
+const STAM={nangman:100,gobong:92,pigeon:112,candy:100};
+const COST={jab:7,straight:10,hook:13,upper:14,body:11,sbak:4};
+function newFighter(ch,x,f,cpu){return{stam:STAM[ch.id]||100,stamMax:STAM[ch.id]||100,tired:false,bsT:-99,atkStart:-99,ch,x,y:0,vx:0,vy:0,f,hp:ch.hp,sup:0,st:'idle',t:0,mf:0,md:null,move:null,anim:0,walkT:0,koT:0,
   combo:0,hitDone:false,hitLanded:false,buf:null,bufT:0,wins:0,cpu,ctrl:{dir:0,down:false,guard:false,press:null},ai:{wait:20,chain:false,lvl:.55},
   stats:{max:0,counters:0,supers:0,dealt:0},seq:[],seqT:null};}
 
@@ -781,25 +795,31 @@ function spark(x,y,kind){sparks.push({x,y,t:0,kind});}
 /* ================= combat ================= */
 function scaled(m,spd){return Object.assign({},m,{s:Math.max(2,Math.round(m.s/spd)),r:Math.max(4,Math.round(m.r/spd))});}
 function canSlip(F,O){return O&&O.st==='attack'&&['jab','straight','upper','sbak'].includes(O.move)&&O.mf<O.md.s+O.md.a&&Math.abs(O.x-F.x)<=O.md.range+10;}
-function resolveMove(b,c,F,O){if(b==='super')return 'super';if(b==='body')return 'body';
+function resolveMove(b,c,F,O){if(b==='super')return 'super';if(b==='bstep')return 'bstep';
+  if(F&&F.tired){if(F===P1&&F.anim-(F.tiredPop||-99)>40){F.tiredPop=F.anim;popAt('숨차!',F.x,GROUND-80,'mid');}return null;}
+  if(b==='straight'&&F&&O&&F.anim-F.bsT<=20&&F.anim-O.atkStart<=26&&Math.abs(O.x-F.x)<=70)return 'sbak';
+  if(b==='body')return 'body';
   if(b==='straight'&&F&&c.dir===-F.f&&canSlip(F,O))return 'sbak';if(c.down&&(b==='jab'||b==='straight'||b==='hook'))return 'body';return b;}
 const COMBOS=[{s:['jab','straight','body'],n:'원투 바디',v:'원투 바디'},{s:['jab','jab','straight'],n:'잽잽2',v:'잽 잽 투'},
   {s:['jab','body'],n:'원 바디',v:'원 바디'},{s:['upper','body'],n:'어퍼 바디',v:'어퍼 바디'},{s:['body','upper'],n:'바디 어퍼',v:'바디 어퍼'},
   {s:['jab','hook'],n:'원 훅',v:'원 훅'},{s:['hook','hook'],n:'양훅',v:'양 훅'},{s:['jab','jab'],n:'잽잽',v:'잽 잽'},{s:['jab','straight'],n:'원투',v:'원 투'},
   {s:['jab','upper'],n:'원 어퍼',v:'원 어퍼'},{s:['hook','straight'],n:'훅 투',v:'훅 투'},{s:['hook','upper'],n:'훅 어퍼',v:'훅 어퍼'}];
 function matchCombo(seq){if(!seq||seq.length<2)return null;for(const c of COMBOS){const k=c.s.length;if(seq.length>=k&&c.s.every((m,i)=>seq[seq.length-k+i]===m))return c;}return null;}
-function startMove(F,mv){if(F.seqT!=null&&F.anim-F.seqT<=30)F.seq.push(mv);else F.seq=[mv];if(F.seq.length>4)F.seq.shift();F.seqT=F.anim;F.st='attack';F.move=mv;F.md=scaled(MOVES[mv],F.ch.spd);F.mf=0;F.hitDone=false;F.hitLanded=false;sfx.swing();}
+function startMove(F,mv){F.atkStart=F.anim;F.stam=Math.max(0,F.stam-(COST[mv]||9));if(F.stam<=0&&!F.tired){F.tired=true;popAt('숨차!',F.x,GROUND-80,'mid');}if(F.seqT!=null&&F.anim-F.seqT<=30)F.seq.push(mv);else F.seq=[mv];if(F.seq.length>4)F.seq.shift();F.seqT=F.anim;F.st='attack';F.move=mv;F.md=scaled(MOVES[mv],F.ch.spd);F.mf=0;F.hitDone=false;F.hitLanded=false;sfx.swing();}
 const AURA={nangman:'#3f7bff',gobong:'#d8262f',pigeon:'#3fbf8a',candy:'#ff4fb0'};
 let cutIn=null,rings=[],parts=[];
 function whiteFlash(){const f=$('wflash');f.classList.remove('on');void f.offsetWidth;f.classList.add('on');}
 function burst(x,y,n,col){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,v=1+Math.random()*3.2;parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-1.2,t:0,col:i%3?col:(i%2?'#ffffff':'#ffd23a')});}}
-function startSuper(F){F.sup=0;F.st='super';F.sk=F.ch.super;F.mf=0;F.hitIdx=0;F.hitLanded=false;F.stats.supers++;superFreeze=52;
+function startSuper(F){const O=F===P1?P2:P1;
+  if(O&&O.st==='super'){O.st='hitstun';O.t=24;O.vx=F.f*3.5;O.mf=0;O.hitBy=null;popAt('SUPER CLASH!',(F.x+O.x)/2,GROUND-96,'cmb');burst((F.x+O.x)/2,GROUND-50,30,'#ffffff');}
+  F.sup=0;F.st='super';F.sk=F.ch.super;F.mf=0;F.hitIdx=0;F.hitLanded=false;F.stats.supers++;superFreeze=52;
   cutIn={F,t:0,col:AURA[F.ch.id]||'#ffd23a'};whiteFlash();shake=Math.max(shake,3);
   callout(F.ch.superName,'sup');sfx.superStart();sayKo(F.ch.superName);lastAtk=F;
   rings.push({x:F.x,y:GROUND-40,t:0,big:true,col:cutIn.col});}
 const isFree=F=>['idle','walk','crouch','block'].includes(F.st);
 function applyHit(A,D,h){
   if(D.st==='ko')return;
+  if(D.st==='bstep'&&D.t>2&&!h.sup){popAt('슥',D.x-D.f*8,GROUND-56,'mid');sfx.dodge();return 'dodge';}
   if(D.st==='attack'&&D.md&&D.md.slip&&D.mf<=D.md.s+1&&!h.sup){popAt('쓱',D.x-D.f*8,GROUND-56,'mid');sfx.dodge();return 'dodge';}
   const crouching=D.st==='crouch'||((D.st==='block'||D.st==='blockstun')&&D.ctrl.down);
   if(h.high&&crouching&&!h.sup){popAt('슥',D.x,GROUND-50,'mid');sfx.dodge();return 'dodge';}
@@ -810,11 +830,14 @@ function applyHit(A,D,h){
     A.sup=Math.min(100,A.sup+h.gain*.3);D.sup=Math.min(100,D.sup+h.gain*.4);
     spark(D.x-A.f*6,GROUND-48,'block');sfx.block();hitstop=Math.max(hitstop,4);
     if(D.hp<=0){D.hp=0;doKO(A,D);}return 'block';}
-  if(D.st==='super'&&SUPERS[D.sk].armor&&D.mf<22){D.hp-=Math.round(h.dmg*.5);spark(D.x-A.f*6,GROUND-46,'block');sfx.block();hitstop=4;if(D.hp<=0){D.hp=0;doKO(A,D);}return 'armor';}
+  if(D.st==='super'&&!h.sup){spark(D.x-A.f*6,GROUND-46,'block');sfx.block();popAt('ARMOR',D.x,GROUND-70,'mid');hitstop=Math.max(hitstop,3);return 'armor';}
+  if(false){D.hp-=Math.round(h.dmg*.5);spark(D.x-A.f*6,GROUND-46,'block');sfx.block();hitstop=4;if(D.hp<=0){D.hp=0;doKO(A,D);}return 'armor';}
   const counter=D.st==='attack'&&D.mf<D.md.s;
   const cmb=A.st==='attack'?(A.move==='sbak'?{n:'쓱박',v:'쓱 박',s:[1,2,3]}:matchCombo(A.seq)):null;
   let dmg=h.dmg*A.ch.pow*(1-.08*Math.min(A.combo,6))*(counter?1.25:1)*(cmb?1.2:1);dmg=Math.max(1,Math.round(dmg));
-  if(cmb){popAt(cmb.n+'!',(A.x+D.x)/2,GROUND-92,'cmb');sfx.combo(cmb.s.length);if(A===P1)sayKo(cmb.v);hitstop=Math.max(hitstop,7);shake=Math.max(shake,3);}
+  if(cmb&&A.move==='sbak'){popAt('쓱박!',(A.x+D.x)/2,GROUND-96,'cmb sbk');sfx.sbak();sayKo('쓱 박!');whiteFlash();hitstop=Math.max(hitstop,16);shake=Math.max(shake,7);
+    rings.push({x:D.x-A.f*4,y:GROUND-50,t:0,big:true,col:'#ffd23a'});burst(D.x-A.f*4,GROUND-50,26,'#ffd23a');A.sup=Math.min(100,A.sup+15);}
+  else if(cmb){popAt(cmb.n+'!',(A.x+D.x)/2,GROUND-92,'cmb');sfx.combo(cmb.s.length);if(A===P1)sayKo(cmb.v);hitstop=Math.max(hitstop,7);shake=Math.max(shake,3);}
   D.hp-=dmg;A.combo++;A.stats.max=Math.max(A.stats.max,A.combo);A.stats.dealt+=dmg;
   if(counter){A.stats.counters++;popAt('카운터!',D.x,GROUND-74,'cnt');}
   D.st='hitstun';D.t=h.hs+(counter?6:0);D.vx=A.f*h.kb;D.mf=0;D.buf=null;D.hitBy=A.move&&A.st==='attack'?A.move:null;
@@ -838,6 +861,11 @@ function updateFighter(F,O){
   F.anim++;const c=F.ctrl;
   if(c.press){F.buf=c.press;F.bufT=12;c.press=null;}else if(F.bufT>0)F.bufT--;else F.buf=null;
   const canAct=mode==='fight';
+  { // stamina: refills while guarding / blocking / backstepping, slowly while idle
+    const r={block:.55,blockstun:.55,bstep:.9,idle:.14,walk:.1,crouch:.14}[F.st]||0;F.stam=Math.min(F.stamMax,F.stam+r);
+    if(F.tired&&F.stam>=F.stamMax*.4){F.tired=false;}}
+  // reversal: answer an opponent's SUPER with your own SUPER -> the later one wins
+  if(canAct&&F.buf==='super'&&F.sup>=100&&O.st==='super'&&!['super','ko'].includes(F.st)){F.buf=null;startSuper(F);return;}
   switch(F.st){
     case 'hitstun':case 'blockstun':
       if(F.y<0||F.vy<0){F.vy+=.38;F.y+=F.vy;if(F.y>=0){F.y=0;F.vy=0;}}
@@ -850,17 +878,20 @@ function updateFighter(F,O){
       if(m.lunge&&F.mf<=m.s+m.a&&Math.abs(O.x-F.x)>24)F.x+=F.f*m.lunge;
       if(!F.hitDone&&F.mf>=m.s&&F.mf<m.s+m.a){
         const d=Math.abs(O.x-F.x);if(d<=m.range+6&&Math.sign(O.x-F.x)===F.f){F.hitDone=true;applyHit(F,O,m);}}
-      if(canAct&&F.buf&&F.hitLanded&&F.mf>=m.s){const mv=resolveMove(F.buf,c);
+      if(canAct&&F.buf&&F.hitLanded&&F.mf>=m.s){const mv=resolveMove(F.buf,c,F,O);
         if(mv==='super'&&F.sup>=100){startSuper(F);F.buf=null;break;}
-        if(m.cancel.includes(mv)){startMove(F,mv);F.buf=null;break;}}
+        if(mv&&m.cancel.includes(mv)){startMove(F,mv);F.buf=null;break;}}
       if(F.mf>=m.s+m.a+m.r)F.st='idle';
       break;}
     case 'super':superUpdate(F,O);break;
+    case 'bstep':F.t--;if(F.t>5)F.x-=F.f*2.8;if(F.t<=0)F.st='idle';break;
     default:{
       F.f=O.x>F.x?1:-1;
       if(canAct&&F.buf){const mv=resolveMove(F.buf,c,F,O);
         if(mv==='super'){if(F.sup>=100){startSuper(F);F.buf=null;break;}}
-        else{startMove(F,mv);F.buf=null;break;}}
+        else if(mv==='bstep'){F.st='bstep';F.t=12;F.bsT=F.anim;F.stam=Math.min(F.stamMax,F.stam+5);F.buf=null;sfx.dodge();break;}
+        else if(mv){startMove(F,mv);F.buf=null;break;}
+        else F.buf=null;}
       if(!canAct){F.st='idle';break;}
       if(c.guard)F.st='block';
       else if(c.down)F.st='crouch';
@@ -882,11 +913,14 @@ function cpuThink(F,O){
   const c=F.ctrl;
   if(F.st==='attack'&&F.hitLanded&&F.ai.chain){const nx={jab:'straight',straight:'hook',body:'upper',hook:'upper'}[F.move];
     if(nx&&F.mf>=F.md.s+F.md.a-1){c.press=nx;F.ai.chain=Math.random()<F.ai.lvl*.5;}}
-  if(--F.ai.wait>0)return;F.ai.wait=9+(Math.random()*12|0);
+  if(O.st==='super'&&F.st!=='super'){if(F.sup>=100&&Math.random()<.5)c.press='super';else{c.guard=true;c.dir=0;}}
+  if(--F.ai.wait>0)return;F.ai.wait=7+(Math.random()*10|0);
   const d=Math.abs(O.x-F.x),tw=Math.sign(O.x-F.x),lvl=F.ai.lvl;
   c.down=false;c.guard=false;c.dir=0;
   if(!isFree(F))return;
+  if(F.tired||F.stam<18){if(Math.random()<.35){c.press='bstep';}else c.guard=true;F.ai.wait=14;return;}
   const oAtk=(O.st==='attack'&&O.mf<O.md.s+O.md.a)||O.st==='super';
+  if(oAtk&&O.st==='attack'&&d<50&&Math.random()<lvl*.3){c.press='bstep';F.ai.wait=6;return;}
   if(oAtk&&d<52&&Math.random()<lvl*.85){
     if(O.st==='attack'&&MOVES[O.move].high&&Math.random()<.35)c.down=true;else c.guard=true;
     F.ai.wait=12;return;}
@@ -933,8 +967,8 @@ function startStage(next){
 }
 function startRound(first){
   ensureAudio();bgm(true);rings=[];parts=[];cutIn=null;
-  for(const [F,x,f] of [[P1,110,1],[P2,210,-1]]){Object.assign(F,{x,f,y:0,vx:0,vy:0,hp:F.ch.hp,st:'idle',combo:0,buf:null,bufT:0,koT:0,mf:0});F.ctrl.press=null;}
-  P2.ai.lvl=Math.min(.92,.48+arc.stage*.14+(round-1)*.08);if(P2.boss){P2.hp=Math.round(P2.ch.hp*1.2);}timer=60;projs=[];sparks=[];rWin=null;hitstop=0;superFreeze=0;
+  for(const [F,x,f] of [[P1,110,1],[P2,210,-1]]){Object.assign(F,{stam:F.stamMax,tired:false,x,f,y:0,vx:0,vy:0,hp:F.ch.hp,st:'idle',combo:0,buf:null,bufT:0,koT:0,mf:0});F.ctrl.press=null;}
+  P2.ai.lvl=Math.min(.95,.6+arc.stage*.12+(round-1)*.06);if(P2.boss){P2.hp=Math.round(P2.ch.hp*1.2);}timer=60;projs=[];sparks=[];rWin=null;hitstop=0;superFreeze=0;
   mode='intro';introT=first?150:100;dr1=100;dr2=100;
 }
 function roundOver(A){
@@ -1041,7 +1075,7 @@ function drawCutIn(c){
 /* ================= HUD ================= */
 function drawPortrait(c,ch,f){const x=c.getContext('2d');x.imageSmoothingEnabled=false;x.clearRect(0,0,20,20);
   x.fillStyle=f>0?'#5a1f3a':'#1f2a5a';x.fillRect(0,0,20,20);org(x,f>0?9:11,12,f);drawHead(ch,0,0,null);}
-const el={h1:$('h1'),h2:$('h2'),d1:$('d1'),d2:$('d2'),s1:$('s1'),s2:$('s2'),sb1:$('sb1'),sb2:$('sb2'),t:$('time'),c1:$('c1'),c2:$('c2'),sup:$('supBtn'),w1:$('w1'),w2:$('w2')};
+const el={t1:$('t1'),t2:$('t2'),tb1:$('tb1'),tb2:$('tb2'),h1:$('h1'),h2:$('h2'),d1:$('d1'),d2:$('d2'),s1:$('s1'),s2:$('s2'),sb1:$('sb1'),sb2:$('sb2'),t:$('time'),c1:$('c1'),c2:$('c2'),sup:$('supBtn'),w1:$('w1'),w2:$('w2')};
 function hud(){
   if(!P1)return;
   const a=Math.max(0,P1.hp/P1.ch.hp*100),b=Math.max(0,P2.hp/(P2.ch.hp*(P2.boss?1.2:1))*100);
@@ -1049,6 +1083,7 @@ function hud(){
   el.h1.style.width=a+'%';el.d1.style.width=dr1+'%';el.h2.style.width=b+'%';el.d2.style.width=dr2+'%';
   el.h1.classList.toggle('low',a<30);el.h2.classList.toggle('low',b<30);
   el.s1.style.width=P1.sup+'%';el.s2.style.width=P2.sup+'%';
+  for(const [t,tb,F] of [[el.t1,el.tb1,P1],[el.t2,el.tb2,P2]]){const v=F.stam/F.stamMax*100;t.style.width=v+'%';tb.classList.toggle('tired',!!F.tired);tb.classList.toggle('low',!F.tired&&v<30);}
   el.sb1.classList.toggle('full',P1.sup>=100);el.sb2.classList.toggle('full',P2.sup>=100);
   el.sup.classList.toggle('ready',P1.sup>=100);
   el.t.textContent=Math.ceil(timer);
@@ -1313,7 +1348,7 @@ function makeChampCard(){
   T(ENDTXT[arc.ch.id].key,1195,'900 40px "Noto Sans KR",sans-serif','#ff4fb0');
   x.fillStyle='#151233';x.fillRect(0,1240,1080,110);
   T('@nangman.boxer',1278,'700 34px "Noto Sans KR",sans-serif','#f6efe3');
-  T('dy747.github.io/bokrini-battle  ·  v2.5',1318,'26px "Noto Sans KR",sans-serif','#a39cc9');
+  T('dy747.github.io/bokrini-battle  ·  v2.6',1318,'26px "Noto Sans KR",sans-serif','#a39cc9');
   return C;}
 
 let resScene=null;
@@ -1363,7 +1398,7 @@ function makeCard(){
   x.fillText(champ?'복린이 체육관 접수 완료 🏆':win?'나랑 붙어볼 복서 구함 👊':'누가 대신 복수 좀 👊',540,1160);
   x.fillStyle='#151233';x.fillRect(0,1232,1080,120);
   x.font='700 34px "Noto Sans KR",sans-serif';x.fillStyle='#f6efe3';x.fillText('@nangman.boxer',540,1272);
-  x.font='26px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';x.fillText('dy747.github.io/bokrini-battle  ·  v2.5',540,1314);
+  x.font='26px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';x.fillText('dy747.github.io/bokrini-battle  ·  v2.6',540,1314);
   return C;
 }
 let shotFile=null;
@@ -1442,7 +1477,7 @@ document.querySelectorAll('.b').forEach(b=>{
   b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);
 });
 document.addEventListener('contextmenu',e=>e.preventDefault());
-const KMAP={j:'jab',k:'straight',l:'hook',i:'upper',o:'super',m:'body'};
+const KMAP={j:'jab',k:'straight',l:'hook',i:'upper',o:'super',m:'body',h:'bstep'};
 addEventListener('keydown',e=>{const k=e.key.toLowerCase();if(['arrowleft','arrowright','arrowdown','arrowup',' '].includes(k))e.preventDefault();
   if(e.repeat)return;ensureAudio();
   if(mode==='select'){if(k==='arrowright')$('pick-'+CHARS[(pick+1)%4].id).click();if(k==='arrowleft')$('pick-'+CHARS[(pick+3)%4].id).click();if(k==='enter')$('goBtn').click();return;}
