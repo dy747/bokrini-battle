@@ -143,7 +143,7 @@ html.rot #btns{right:calc(env(safe-area-inset-bottom,0px) + 6px);bottom:calc(env
 #knob{position:absolute;left:50%;top:50%;width:42%;aspect-ratio:1;border-radius:50%;transform:translate(-50%,-50%);
   background:radial-gradient(circle at 35% 30%,#e9ecff,#7f86b5 60%,#3b3f66);box-shadow:0 3px 8px rgba(0,0,0,.6)}
 #btns{position:absolute;right:max(14px,calc(env(safe-area-inset-right,0px) + 8px));bottom:calc(env(safe-area-inset-bottom,0px) + 10px);
-  display:grid;grid-template-areas:'k j s x' 'g h u b';grid-template-columns:repeat(4,clamp(48px,calc(var(--lh,1vh) * 15),66px));grid-auto-rows:clamp(48px,calc(var(--lh,1vh) * 15),66px);gap:clamp(6px,calc(var(--lh,1vh) * 2),10px);pointer-events:none}
+  display:grid;grid-template-areas:'k j s x' 'g h u x';grid-template-columns:repeat(4,clamp(48px,calc(var(--lh,1vh) * 15),66px));grid-auto-rows:clamp(48px,calc(var(--lh,1vh) * 15),66px);gap:clamp(6px,calc(var(--lh,1vh) * 2),10px);pointer-events:none}
 .b{pointer-events:auto;touch-action:none;border-radius:50%;border:2px solid;display:grid;place-items:center;
   font:900 clamp(11px,calc(var(--lh,1vh) * 3.4),14px)/1.1 var(--f-body);color:#fff;text-align:center;cursor:pointer;padding:0;
   background:rgba(14,10,36,.62);box-shadow:inset 0 0 10px rgba(0,0,0,.6)}
@@ -158,7 +158,7 @@ html.rot #btns{right:calc(env(safe-area-inset-bottom,0px) + 6px);bottom:calc(env
 html.port{}
 @media all{
   html.port #joy{width:min(124px,29vw);bottom:calc(env(safe-area-inset-bottom,0px) + 40px)}
-  html.port #btns{grid-template-areas:'k j s x' 'g h u b';grid-template-columns:repeat(4,min(56px,13.4vw));grid-auto-rows:min(56px,13.4vw);gap:min(7px,1.8vw);bottom:calc(env(safe-area-inset-bottom,0px) + 30px)}
+  html.port #btns{grid-template-areas:'k j s x' 'g h u x';grid-template-columns:repeat(4,min(56px,13.4vw));grid-auto-rows:min(56px,13.4vw);gap:min(7px,1.8vw);bottom:calc(env(safe-area-inset-bottom,0px) + 30px)}
 }
 
 /* Overlays */
@@ -261,6 +261,7 @@ html.short .stat{gap:1px 6px}
 #goBtn{flex:none;padding-block:clamp(8px,calc(var(--lh,1vh)*2.4),13px)}
 
 .b.bk{border-color:#9aa3c9;font-size:clamp(9px,calc(var(--lh,1vh) * 2.9),12px)}
+#btns .b[data-k=super]{align-self:center;width:100%;aspect-ratio:1;height:auto}
 .b.bd{border-color:#ff9a3a;box-shadow:0 0 8px rgba(255,154,58,.55),inset 0 0 10px rgba(255,154,58,.25)}
 /* joystick: lower and smaller so it covers less; while held, the ring nearly vanishes and only the knob shows */
 #joy{left:max(16px,calc(env(safe-area-inset-left,0px) + 10px));bottom:calc(env(safe-area-inset-bottom,0px) + 2px);width:clamp(96px,calc(var(--lh,1vh) * 30),136px)}
@@ -343,15 +344,14 @@ html.port #endBtn{align-self:center}
     <button class="b rd" data-k="hook" style="grid-area:h" type="button">훅<small>L</small></button>
     <button class="b rd" data-k="upper" style="grid-area:u" type="button">어퍼<small>I</small></button>
     <button class="b su" data-k="super" id="supBtn" style="grid-area:x" type="button">SUPER<small>O</small></button>
-    <button class="b bd" data-k="body" style="grid-area:b" type="button">바디<small>M</small></button>
   </div>
 </div>
 
 <div class="ov" id="selOv">
   <div class="card">
-    <div class="selHead"><div class="selLeft"><button class="exitBtn exitTop" type="button">완전 종료</button><p class="cnt" id="cnt" aria-live="polite"></p></div><div class="logo">복린이 대전<small>ROOKIE BOXING BATTLE</small></div><p class="credit"><span>v2.7</span><a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a></p></div>
+    <div class="selHead"><div class="selLeft"><button class="exitBtn exitTop" type="button">완전 종료</button><p class="cnt" id="cnt" aria-live="polite"></p></div><div class="logo">복린이 대전<small>ROOKIE BOXING BATTLE</small></div><p class="credit"><span>v2.8</span><a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a></p></div>
     <div class="sel" id="sel"></div>
-    <p class="help selhelp"><b>뒤로+2</b> 또는 <b>백스텝→2</b> 쓱박 · 펀치마다 <b>스태미나</b> 소모, 가드·백스텝으로 회복 · 콤보 <b>1-1 · 1-2 · 1-훅 · 훅-훅 · 1-바디 …</b></p>
+    <p class="help selhelp"><b>뒤로+2</b> 또는 <b>백스텝→2</b> 쓱박 · 펀치마다 <b>스태미나</b> 소모, 가드·백스텝으로 회복 · 콤보 <b>1-1 · 1-2 · 1-어퍼 · 훅-훅 · 훅-2</b> … 숨은 기술도 찾아보세요</p>
     <button class="btn" id="goBtn" type="button">링 위로 올라가기</button>
   </div>
 </div>
@@ -1348,7 +1348,7 @@ function makeChampCard(){
   T(ENDTXT[arc.ch.id].key,1195,'900 40px "Noto Sans KR",sans-serif','#ff4fb0');
   x.fillStyle='#151233';x.fillRect(0,1240,1080,110);
   T('@nangman.boxer',1278,'700 34px "Noto Sans KR",sans-serif','#f6efe3');
-  T('dy747.github.io/bokrini-battle  ·  v2.7',1318,'26px "Noto Sans KR",sans-serif','#a39cc9');
+  T('dy747.github.io/bokrini-battle  ·  v2.8',1318,'26px "Noto Sans KR",sans-serif','#a39cc9');
   return C;}
 
 let resScene=null;
@@ -1398,7 +1398,7 @@ function makeCard(){
   x.fillText(champ?'복린이 체육관 접수 완료 🏆':win?'나랑 붙어볼 복서 구함 👊':'누가 대신 복수 좀 👊',540,1160);
   x.fillStyle='#151233';x.fillRect(0,1232,1080,120);
   x.font='700 34px "Noto Sans KR",sans-serif';x.fillStyle='#f6efe3';x.fillText('@nangman.boxer',540,1272);
-  x.font='26px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';x.fillText('dy747.github.io/bokrini-battle  ·  v2.7',540,1314);
+  x.font='26px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';x.fillText('dy747.github.io/bokrini-battle  ·  v2.8',540,1314);
   return C;
 }
 let shotFile=null;
