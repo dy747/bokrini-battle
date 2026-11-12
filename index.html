@@ -176,8 +176,13 @@ html.port{}
 #resOv .stats div{padding:clamp(3px,calc(var(--lh,1vh)*1.2),8px) 4px}
 #resOv .stats b{margin-top:clamp(2px,calc(var(--lh,1vh)*1),6px);font-size:clamp(11px,calc(var(--lh,1vh)*3.4),14px)}
 #resOv .btn{padding-block:clamp(8px,calc(var(--lh,1vh)*2.4),13px)}
-.credit{margin:0;font-size:clamp(10px,calc(var(--lh,1vh)*2.4),12px);color:var(--dim);font-weight:700}
-.credit span{font-family:var(--f-px);font-size:.8em;color:var(--gold)}
+.selHead{display:grid;grid-template-columns:1fr auto 1fr;align-items:start;width:100%;gap:8px}
+.credit{margin:0;justify-self:end;text-align:right;display:flex;flex-direction:column;gap:3px;font-size:clamp(9px,calc(var(--lh,1vh)*2.4),12px);font-weight:700;line-height:1.2}
+.credit span{font-family:var(--f-px);font-size:.85em;color:var(--gold)}
+#selOv .logo{white-space:nowrap}
+html.port .selHead{display:block;position:relative;padding-top:18px}
+html.port .credit{position:absolute;top:0;right:0;flex-direction:row;gap:8px;align-items:baseline}
+html.port .ch canvas{min-height:calc(var(--lh,1vh)*10)}
 .credit a{color:var(--pink);text-decoration:none}
 #shotOv{z-index:30;background:rgba(7,6,15,.96)}
 #shotOv .card{height:100%;justify-content:center;gap:10px}
@@ -218,13 +223,15 @@ html.rot body{position:fixed;left:0;top:0;width:var(--sw);height:var(--sh);trans
 .sel{grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:minmax(0,1fr);flex:0 1 calc(var(--lh,1vh)*60);min-height:0}
 html.port .sel{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));flex-basis:calc(var(--lh,1vh)*66)}
 .ch{min-height:0;overflow:hidden;gap:2px;padding:6px}
-.ch canvas{flex:1 1 0;min-height:0;width:100%;height:auto;aspect-ratio:auto;object-fit:contain}
+.ch canvas{flex:1 1 0;min-height:calc(var(--lh,1vh)*24);width:100%;height:auto;aspect-ratio:auto;object-fit:contain}
 .ch b{font-size:clamp(13px,calc(var(--lh,1vh)*3.4),18px)}
 .ch em{font-size:clamp(8px,calc(var(--lh,1vh)*2.2),10px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .stat{font-size:clamp(8px,calc(var(--lh,1vh)*2.2),10px);gap:2px 6px}
 .stat i{height:4px}
 .sname{font-size:clamp(9px,calc(var(--lh,1vh)*2.4),11px)}
-.selhelp{margin:0;font-size:clamp(9px,calc(var(--lh,1vh)*2.4),12px)}
+.selhelp{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;margin:0;font-size:clamp(9px,calc(var(--lh,1vh)*2.4),12px)}
+html.short .ch em,html.short .sname{display:none}
+html.short .stat{gap:1px 6px}
 #goBtn{flex:none;padding-block:clamp(8px,calc(var(--lh,1vh)*2.4),13px)}
 </style>
 
@@ -275,11 +282,10 @@ html.port .sel{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:
 
 <div class="ov" id="selOv">
   <div class="card">
-    <div class="logo">복린이 대전<small>ROOKIE BOXING BATTLE</small></div>
-        <div class="sel" id="sel"></div>
+    <div class="selHead"><span></span><div class="logo">복린이 대전<small>ROOKIE BOXING BATTLE</small></div><p class="credit"><span>v1.1</span><a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a></p></div>
+    <div class="sel" id="sel"></div>
     <p class="help selhelp"><b>↓</b> 숙이면 펀치 회피 · <b>뒤로 당기기/가드</b> 막기 · 펀치 <b>이어 누르면 콤보</b> · 게이지 차면 <b>SUPER</b> · 3판 2선승</p>
     <button class="btn" id="goBtn" type="button">링 위로 올라가기</button>
-    <p class="credit"><span>v1.0</span> · 만든이 <a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a> (낭만.복서)</p>
   </div>
 </div>
 
@@ -956,7 +962,7 @@ function makeCard(){
   x.fillText(win?'나랑 붙어볼 복서 구함 👊':'누가 대신 복수 좀 👊',540,1160);
   x.fillStyle='#151233';x.fillRect(0,1232,1080,120);
   x.font='700 34px "Noto Sans KR",sans-serif';x.fillStyle='#f6efe3';x.fillText('@nangman.boxer',540,1272);
-  x.font='26px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';x.fillText('dy747.github.io/bokrini-battle  ·  v1.0',540,1314);
+  x.font='26px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';x.fillText('dy747.github.io/bokrini-battle  ·  v1.1',540,1314);
   return C;
 }
 let shotFile=null;
@@ -1033,7 +1039,7 @@ function fit(){
   const rw=innerWidth,rh=innerHeight;ROT=orient==='land'&&rh>rw&&$('oriOv').hidden&&$('fsOv').hidden;
   const de=document.documentElement;de.classList.toggle('rot',ROT);
   const vw=ROT?rh:rw,vh=ROT?rw:rh,portrait=vh>vw;de.classList.toggle('port',portrait);
-  de.style.setProperty('--sw',vw+'px');de.style.setProperty('--sh',vh+'px');de.style.setProperty('--lh',(vh/100)+'px');
+  de.style.setProperty('--sw',vw+'px');de.style.setProperty('--sh',vh+'px');de.style.setProperty('--lh',(vh/100)+'px');de.classList.toggle('short',vh<520);
   // landscape: fill the whole screen (crop a little sky/floor); portrait: 16:9 strip near the top
   let bw,bh,cw,ch;
   if(!portrait&&vw/vh>=16/9){bw=vw;bh=vh;cw=vw;ch=Math.ceil(vw*9/16);}
