@@ -11,6 +11,13 @@
 <meta property="og:url" content="https://dy747.github.io/bokrini-battle/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#07060f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="복린이 대전">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-512.png">
+<link rel="icon" href="icon-192.png">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}*{-webkit-text-size-adjust:100%}</style>
 <title>복린이 대전</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,7 +34,8 @@
   --f-px:"Press Start 2P","Noto Sans KR",monospace;
   --u:2;--lh:1vh;
 }
-html,body{height:100%}
+html,body{height:100%;overscroll-behavior:none;overflow:hidden}
+body{position:fixed;inset:0}
 body{margin:0;background:var(--bg);color:var(--chalk);font-family:var(--f-body);overflow:hidden;touch-action:none;
   -webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;
   padding-left:max(0px,env(safe-area-inset-left,0px));padding-right:max(0px,env(safe-area-inset-right,0px))}
@@ -66,6 +74,8 @@ body{margin:0;background:var(--bg);color:var(--chalk);font-family:var(--f-body);
 .mid{text-align:center;line-height:1;padding-top:calc(var(--u)*1px)}
 .mid small{display:block;font-family:var(--f-px);font-size:calc(var(--u)*3.6px);color:var(--chalk)}
 .mid span{font-family:var(--f-px);font-size:calc(var(--u)*11px);color:var(--gold);text-shadow:0 calc(var(--u)*1px) 0 #8a3d00;display:block;margin-top:calc(var(--u)*2px);font-variant-numeric:tabular-nums}
+#fsBtn{position:absolute;left:calc(var(--u)*20px);top:calc(var(--u)*30px);width:calc(var(--u)*11px);height:calc(var(--u)*11px);background:rgba(10,8,30,.6);border:1px solid var(--chalk);color:var(--chalk);font:900 calc(var(--u)*6px) var(--f-body);padding:0;cursor:pointer;line-height:1}
+#toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 24px);transform:translateX(-50%);z-index:30;max-width:calc(100% - 32px);box-sizing:border-box;background:#1d1840;border:2px solid var(--gold);color:var(--chalk);font:700 13px/1.5 var(--f-body);padding:10px 14px;text-align:center}
 #pauseBtn{position:absolute;left:calc(var(--u)*6px);top:calc(var(--u)*30px);width:calc(var(--u)*11px);height:calc(var(--u)*11px);
   background:rgba(10,8,30,.6);border:1px solid var(--chalk);color:var(--chalk);font:900 calc(var(--u)*5px) var(--f-body);padding:0;cursor:pointer;pointer-events:auto}
 
@@ -92,7 +102,7 @@ body{margin:0;background:var(--bg);color:var(--chalk);font-family:var(--f-body);
 /* Controls */
 #ctl{position:fixed;inset:0;pointer-events:none;z-index:3}
 #ctl[hidden]{display:none!important}
-#joy{position:absolute;left:max(14px,calc(env(safe-area-inset-left,0px) + 8px));bottom:calc(env(safe-area-inset-bottom,0px) + 12px);
+#joy{position:absolute;left:max(30px,calc(env(safe-area-inset-left,0px) + 22px));bottom:calc(env(safe-area-inset-bottom,0px) + 12px);
   width:clamp(104px,calc(var(--lh,1vh) * 33),150px);aspect-ratio:1;border-radius:50%;pointer-events:auto;touch-action:none;
   background:radial-gradient(circle,rgba(30,40,110,.45) 55%,rgba(20,24,70,.65));border:2px solid rgba(110,150,255,.85);
   box-shadow:0 0 14px rgba(63,123,255,.6),inset 0 0 16px rgba(63,123,255,.35)}
@@ -210,6 +220,7 @@ html.port .sel{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:
     </div>
   </div>
   <button id="pauseBtn" type="button" aria-label="일시정지">II</button>
+  <button id="fsBtn" type="button" aria-label="전체화면">⛶</button>
   <div id="pops"></div>
   <div class="combo" id="c1" hidden></div>
   <div class="combo" id="c2" hidden></div>
@@ -785,6 +796,16 @@ $('goBtn').addEventListener('click',()=>{ensureAudio();startMatch();});
 $('againBtn').addEventListener('click',()=>{ensureAudio();startMatch();});
 $('selBtn').addEventListener('click',toSelect);
 $('quitBtn').addEventListener('click',toSelect);
+const isIOS=/iP(hone|od|ad)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+const standalone=matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone;
+function toast(t){let el=$('toast');if(!el){el=document.createElement('div');el.id='toast';document.body.appendChild(el);}el.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,4200);}
+function goFull(lockLand){
+  const de=document.documentElement,req=de.requestFullscreen||de.webkitRequestFullscreen;
+  if(document.fullscreenElement||document.webkitFullscreenElement)return true;
+  if(!req){if(!standalone)toast(isIOS?'아이폰은 공유 버튼 → "홈 화면에 추가"로 열면 전체화면이에요':'이 브라우저는 전체화면을 지원하지 않아요');return false;}
+  try{const p=req.call(de,{navigationUI:'hide'});if(p&&p.then)p.then(()=>{if(lockLand&&screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(()=>{});setTimeout(fit,300);}).catch(()=>{});}catch(e){}
+  return true;}
+$('fsBtn').addEventListener('click',()=>{if(document.fullscreenElement){document.exitFullscreen&&document.exitFullscreen();return;}goFull(orient==='land');});
 $('pauseBtn').addEventListener('click',()=>{if(mode==='select'||mode==='result')return;paused=true;$('pauseOv').hidden=false;});
 $('resumeBtn').addEventListener('click',()=>{paused=false;$('pauseOv').hidden=true;});
 $('copyBtn').addEventListener('click',()=>{const ta=$('shareTxt'),btn=$('copyBtn');
@@ -837,9 +858,14 @@ function fit(){
   gm.style.top=portrait?Math.round(Math.max(h/2+50,vh*.33))+'px':'50%';
 }
 function setOrient(o){orient=o;try{localStorage.setItem('bk-orient',o)}catch(e){}fit();}
-function oriPick(o,e){if(e)e.preventDefault();if($('oriOv').hidden)return;$('oriOv').hidden=true;ensureAudio();setOrient(o);}
+function oriPick(o,e){if(e)e.preventDefault();if($('oriOv').hidden)return;$('oriOv').hidden=true;ensureAudio();setOrient(o);if(!isIOS)goFull(o==='land');}
 for(const [id,o] of [['oriPort','port'],['oriLand','land']]){const b=$(id);b.addEventListener('click',e=>oriPick(o,e));b.addEventListener('pointerup',e=>oriPick(o,e));}
 if(innerHeight>innerWidth)$('oriOv').hidden=false;
+document.addEventListener('touchmove',e=>{if(!e.target.closest||!e.target.closest('.ov'))e.preventDefault();},{passive:false});
+['gesturestart','gesturechange'].forEach(t=>document.addEventListener(t,e=>e.preventDefault()));
+document.querySelectorAll('#joy,.b').forEach(el=>el.addEventListener('touchstart',e=>e.preventDefault(),{passive:false}));
+let lastTouchEnd=0;document.addEventListener('touchend',e=>{const n=Date.now();if(n-lastTouchEnd<300&&!(e.target.closest&&e.target.closest('button')))e.preventDefault();lastTouchEnd=n;},{passive:false});
+addEventListener('fullscreenchange',()=>setTimeout(fit,200));
 addEventListener('resize',fit);addEventListener('orientationchange',()=>setTimeout(fit,250));
 fit();
 requestAnimationFrame(frame);
