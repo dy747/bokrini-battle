@@ -137,7 +137,7 @@ html.rot #btns{right:calc(env(safe-area-inset-bottom,0px) + 6px);bottom:calc(env
 #knob{position:absolute;left:50%;top:50%;width:42%;aspect-ratio:1;border-radius:50%;transform:translate(-50%,-50%);
   background:radial-gradient(circle at 35% 30%,#e9ecff,#7f86b5 60%,#3b3f66);box-shadow:0 3px 8px rgba(0,0,0,.6)}
 #btns{position:absolute;right:max(14px,calc(env(safe-area-inset-right,0px) + 8px));bottom:calc(env(safe-area-inset-bottom,0px) + 10px);
-  display:grid;grid-template-areas:'g j s x' 'g h u x';grid-template-columns:repeat(4,clamp(48px,calc(var(--lh,1vh) * 15),66px));grid-auto-rows:clamp(48px,calc(var(--lh,1vh) * 15),66px);gap:clamp(6px,calc(var(--lh,1vh) * 2),10px);pointer-events:none}
+  display:grid;grid-template-areas:'g j s x' 'g h u b';grid-template-columns:repeat(4,clamp(48px,calc(var(--lh,1vh) * 15),66px));grid-auto-rows:clamp(48px,calc(var(--lh,1vh) * 15),66px);gap:clamp(6px,calc(var(--lh,1vh) * 2),10px);pointer-events:none}
 .b{pointer-events:auto;touch-action:none;border-radius:50%;border:2px solid;display:grid;place-items:center;
   font:900 clamp(11px,calc(var(--lh,1vh) * 3.4),14px)/1.1 var(--f-body);color:#fff;text-align:center;cursor:pointer;padding:0;
   background:rgba(14,10,36,.62);box-shadow:inset 0 0 10px rgba(0,0,0,.6)}
@@ -151,8 +151,8 @@ html.rot #btns{right:calc(env(safe-area-inset-bottom,0px) + 6px);bottom:calc(env
 .b.on{transform:scale(.9);background:rgba(255,255,255,.18)}
 html.port{}
 @media all{
-  html.port #joy{width:min(150px,36vw);bottom:calc(env(safe-area-inset-bottom,0px) + 40px)}
-  html.port #btns{grid-template-areas:'j s x' 'h u g';grid-template-columns:repeat(3,min(66px,16.5vw));grid-auto-rows:min(66px,16.5vw);gap:min(10px,2.4vw);bottom:calc(env(safe-area-inset-bottom,0px) + 30px)}
+  html.port #joy{width:min(124px,29vw);bottom:calc(env(safe-area-inset-bottom,0px) + 40px)}
+  html.port #btns{grid-template-areas:'g j s x' 'g h u b';grid-template-columns:repeat(4,min(56px,13.4vw));grid-auto-rows:min(56px,13.4vw);gap:min(7px,1.8vw);bottom:calc(env(safe-area-inset-bottom,0px) + 30px)}
 }
 
 /* Overlays */
@@ -254,8 +254,8 @@ html.short .ch em,html.short .sname{display:none}
 html.short .stat{gap:1px 6px}
 #goBtn{flex:none;padding-block:clamp(8px,calc(var(--lh,1vh)*2.4),13px)}
 
-#btns .b[data-k=guard],#btns .b[data-k=super]{align-self:center;width:100%;aspect-ratio:1;height:auto}
-html.port #btns .b[data-k=guard],html.port #btns .b[data-k=super]{align-self:stretch;aspect-ratio:auto}
+#btns .b[data-k=guard]{align-self:center;width:100%;aspect-ratio:1;height:auto}
+.b.bd{border-color:#ff9a3a;box-shadow:0 0 8px rgba(255,154,58,.55),inset 0 0 10px rgba(255,154,58,.25)}
 /* joystick: lower and smaller so it covers less; while held, the ring nearly vanishes and only the knob shows */
 #joy{left:max(16px,calc(env(safe-area-inset-left,0px) + 10px));bottom:calc(env(safe-area-inset-bottom,0px) + 2px);width:clamp(96px,calc(var(--lh,1vh) * 30),136px)}
 html.port #joy{bottom:calc(env(safe-area-inset-bottom,0px) + 34px)}
@@ -333,14 +333,15 @@ html.port #endBtn{align-self:center}
     <button class="b rd" data-k="hook" style="grid-area:h" type="button">훅<small>L</small></button>
     <button class="b rd" data-k="upper" style="grid-area:u" type="button">어퍼<small>I</small></button>
     <button class="b su" data-k="super" id="supBtn" style="grid-area:x" type="button">SUPER<small>O</small></button>
+    <button class="b bd" data-k="body" style="grid-area:b" type="button">바디<small>M</small></button>
   </div>
 </div>
 
 <div class="ov" id="selOv">
   <div class="card">
-    <div class="selHead"><div class="selLeft"><button class="exitBtn exitTop" type="button">완전 종료</button><p class="cnt" id="cnt" aria-live="polite"></p></div><div class="logo">복린이 대전<small>ROOKIE BOXING BATTLE</small></div><p class="credit"><span>v2.4</span><a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a></p></div>
+    <div class="selHead"><div class="selLeft"><button class="exitBtn exitTop" type="button">완전 종료</button><p class="cnt" id="cnt" aria-live="polite"></p></div><div class="logo">복린이 대전<small>ROOKIE BOXING BATTLE</small></div><p class="credit"><span>v2.5</span><a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a></p></div>
     <div class="sel" id="sel"></div>
-    <p class="help selhelp">콤보 <b>1-1 · 1-1-2 · 1-2 · 1-어퍼 · 훅-2 · 훅-어퍼</b> 빠르게 이어 누르기 · <b>↓</b> 숙여 피하기 · <b>뒤로/가드</b> 막기</p>
+    <p class="help selhelp"><b>뒤로+2</b> 쓱박 · <b>1-1 · 1-2 · 1-훅 · 1-어퍼 · 훅-훅 · 1-바디 · 1-2-바디 · 어퍼-바디 · 바디-어퍼</b></p>
     <button class="btn" id="goBtn" type="button">링 위로 올라가기</button>
   </div>
 </div>
@@ -445,10 +446,11 @@ const CHARS=[
  const a=CHARS[0],b=CHARS[1];for(const p of k){const t=a[p];a[p]=b[p];b[p]=t;if(a[p]===undefined)delete a[p];if(b[p]===undefined)delete b[p];}})();
 const MOVES={
  jab:     {s:4, a:3,r:8, dmg:4, range:36,hs:13,kb:1.6,high:true, gain:6, cancel:['jab','straight','hook','upper','body']},
- straight:{s:7, a:3,r:14,dmg:9, range:44,hs:16,kb:3,  high:true, gain:9, cancel:['hook','upper']},
- hook:    {s:7, a:4,r:15,dmg:12,range:38,hs:20,kb:4.5,high:true, gain:10,cancel:['straight','upper'],big:true,lunge:1.4,sy:52},
- upper:   {s:7, a:4,r:18,dmg:14,range:34,hs:26,kb:2.2,high:false,gain:11,cancel:[],big:true,lunge:1.1,launch:-3.4,sy:58},
- body:    {s:7, a:3,r:13,dmg:7, range:36,hs:15,kb:1.8,high:false,gain:8, cancel:['straight','hook','upper']},
+ straight:{s:7, a:3,r:14,dmg:9, range:44,hs:16,kb:3,  high:true, gain:9, cancel:['hook','upper','body']},
+ hook:    {s:7, a:4,r:15,dmg:12,range:38,hs:20,kb:4.5,high:true, gain:10,cancel:['hook','straight','upper','body'],big:true,lunge:1.4,sy:52},
+ upper:   {s:7, a:4,r:18,dmg:14,range:34,hs:26,kb:2.2,high:false,gain:11,cancel:['body'],big:true,lunge:1.1,launch:-3.4,sy:58},
+ body:    {s:7, a:3,r:13,dmg:8, range:40,hs:17,kb:1.6,high:false,gain:9, cancel:['straight','hook','upper'],lunge:1.8},
+ sbak:    {s:6, a:3,r:12,dmg:12,range:50,hs:20,kb:3.5,high:true, gain:12,cancel:['hook','body','upper'],big:true,slip:true},
 };
 const SUPERS={
  rush:{dur:56,adv:1.4,hits:[[12,5,38,1,14],[19,5,38,1,14],[26,5,38,1,14],[33,5,38,1,14],[44,14,42,6,32]]},
@@ -553,6 +555,7 @@ function pose(F){
     case 'hitstun':
       if(F.hitBy==='upper'){p.lean=-6;p.fr=[6,-60];p.rr=[1,-58];p.tilt=-2;}
       else if(F.hitBy==='hook'){p.lean=-5;p.fr=[8,-44];p.rr=[3,-42];p.tilt=-3;}
+      else if(F.hitBy==='body'){p.lean=3;p.cr=6;p.fr=[7,-34];p.rr=[3,-32];p.tilt=1;}
       else{p.lean=-4;p.fr=[9,-43];p.rr=[5,-41];p.tilt=-1;}break;
     case 'ko':p.lean=-5;p.fr=[4,-40];p.rr=[0,-38];break;
     case 'champ':{const w=Math.round(Math.sin((F.anim||0)*.12));p.rr=[3,-74+w];p.fr=[8,-74+w];p.trophy=true;break;}
@@ -569,7 +572,10 @@ function pose(F){
       else if(F.move==='upper'){ // dip low, then drive up through the chin
         if(e<0){const w=-e/.3;p.cr=10*w;p.rr=[6,-32];p.fr=[12,-52];p.lean=1;}
         else{p.cr=3*(1-e);p.rr=[10+11*e,-32-42*e];p.fr=[12,-52];p.lean=3*e;p.step=2*e;p.trail=f>=m.s&&f<m.s+m.a?'upper':null;}}
-      else if(F.move==='body'){p.cr=8;p.fr=[14+17*ep,-44];p.rr=[8,-48];p.lean=2*ep;}
+      else if(F.move==='body'){p.cr=8;p.fr=[14+17*ep,-42];p.rr=[8,-50];p.lean=2.5*ep;p.step=2*ep;}
+      else if(F.move==='sbak'){ // slip back-and-down out of the punch, then fire the 2
+        if(e<0){const w=Math.min(1,(-e/.3)*1.8);p.lean=-7*w;p.cr=6*w;p.tilt=-1;p.fr=[10,-50];p.rr=[6,-49];p.step=-3*w;}
+        else{p.rr=[8+29*e,-49];p.fr=[11,-52];p.lean=4.5*ep;p.step=3*ep;p.cr=2*(1-ep);}}
       break;}
     case 'super':{
       const k=F.sk,f=F.mf;
@@ -774,8 +780,12 @@ function spark(x,y,kind){sparks.push({x,y,t:0,kind});}
 
 /* ================= combat ================= */
 function scaled(m,spd){return Object.assign({},m,{s:Math.max(2,Math.round(m.s/spd)),r:Math.max(4,Math.round(m.r/spd))});}
-function resolveMove(b,c){if(b==='super')return 'super';if(c.down&&(b==='jab'||b==='straight'||b==='hook'))return 'body';return b;}
-const COMBOS=[{s:['jab','jab','straight'],n:'잽잽2',v:'잽 잽 투'},{s:['jab','jab'],n:'잽잽',v:'잽 잽'},{s:['jab','straight'],n:'원투',v:'원 투'},
+function canSlip(F,O){return O&&O.st==='attack'&&['jab','straight','upper','sbak'].includes(O.move)&&O.mf<O.md.s+O.md.a&&Math.abs(O.x-F.x)<=O.md.range+10;}
+function resolveMove(b,c,F,O){if(b==='super')return 'super';if(b==='body')return 'body';
+  if(b==='straight'&&F&&c.dir===-F.f&&canSlip(F,O))return 'sbak';if(c.down&&(b==='jab'||b==='straight'||b==='hook'))return 'body';return b;}
+const COMBOS=[{s:['jab','straight','body'],n:'원투 바디',v:'원투 바디'},{s:['jab','jab','straight'],n:'잽잽2',v:'잽 잽 투'},
+  {s:['jab','body'],n:'원 바디',v:'원 바디'},{s:['upper','body'],n:'어퍼 바디',v:'어퍼 바디'},{s:['body','upper'],n:'바디 어퍼',v:'바디 어퍼'},
+  {s:['jab','hook'],n:'원 훅',v:'원 훅'},{s:['hook','hook'],n:'양훅',v:'양 훅'},{s:['jab','jab'],n:'잽잽',v:'잽 잽'},{s:['jab','straight'],n:'원투',v:'원 투'},
   {s:['jab','upper'],n:'원 어퍼',v:'원 어퍼'},{s:['hook','straight'],n:'훅 투',v:'훅 투'},{s:['hook','upper'],n:'훅 어퍼',v:'훅 어퍼'}];
 function matchCombo(seq){if(!seq||seq.length<2)return null;for(const c of COMBOS){const k=c.s.length;if(seq.length>=k&&c.s.every((m,i)=>seq[seq.length-k+i]===m))return c;}return null;}
 function startMove(F,mv){if(F.seqT!=null&&F.anim-F.seqT<=30)F.seq.push(mv);else F.seq=[mv];if(F.seq.length>4)F.seq.shift();F.seqT=F.anim;F.st='attack';F.move=mv;F.md=scaled(MOVES[mv],F.ch.spd);F.mf=0;F.hitDone=false;F.hitLanded=false;sfx.swing();}
@@ -790,6 +800,7 @@ function startSuper(F){F.sup=0;F.st='super';F.sk=F.ch.super;F.mf=0;F.hitIdx=0;F.
 const isFree=F=>['idle','walk','crouch','block'].includes(F.st);
 function applyHit(A,D,h){
   if(D.st==='ko')return;
+  if(D.st==='attack'&&D.md&&D.md.slip&&D.mf<=D.md.s+1&&!h.sup){popAt('쓱',D.x-D.f*8,GROUND-56,'mid');sfx.dodge();return 'dodge';}
   const crouching=D.st==='crouch'||((D.st==='block'||D.st==='blockstun')&&D.ctrl.down);
   if(h.high&&crouching&&!h.sup){popAt('슥',D.x,GROUND-50,'mid');sfx.dodge();return 'dodge';}
   const guarding=D.ctrl.guard||D.ctrl.dir===-D.f;
@@ -801,7 +812,7 @@ function applyHit(A,D,h){
     if(D.hp<=0){D.hp=0;doKO(A,D);}return 'block';}
   if(D.st==='super'&&SUPERS[D.sk].armor&&D.mf<22){D.hp-=Math.round(h.dmg*.5);spark(D.x-A.f*6,GROUND-46,'block');sfx.block();hitstop=4;if(D.hp<=0){D.hp=0;doKO(A,D);}return 'armor';}
   const counter=D.st==='attack'&&D.mf<D.md.s;
-  const cmb=A.st==='attack'?matchCombo(A.seq):null;
+  const cmb=A.st==='attack'?(A.move==='sbak'?{n:'쓱박',v:'쓱 박',s:[1,2,3]}:matchCombo(A.seq)):null;
   let dmg=h.dmg*A.ch.pow*(1-.08*Math.min(A.combo,6))*(counter?1.25:1)*(cmb?1.2:1);dmg=Math.max(1,Math.round(dmg));
   if(cmb){popAt(cmb.n+'!',(A.x+D.x)/2,GROUND-92,'cmb');sfx.combo(cmb.s.length);if(A===P1)sayKo(cmb.v);hitstop=Math.max(hitstop,7);shake=Math.max(shake,3);}
   D.hp-=dmg;A.combo++;A.stats.max=Math.max(A.stats.max,A.combo);A.stats.dealt+=dmg;
@@ -847,7 +858,7 @@ function updateFighter(F,O){
     case 'super':superUpdate(F,O);break;
     default:{
       F.f=O.x>F.x?1:-1;
-      if(canAct&&F.buf){const mv=resolveMove(F.buf,c);
+      if(canAct&&F.buf){const mv=resolveMove(F.buf,c,F,O);
         if(mv==='super'){if(F.sup>=100){startSuper(F);F.buf=null;break;}}
         else{startMove(F,mv);F.buf=null;break;}}
       if(!canAct){F.st='idle';break;}
@@ -887,7 +898,7 @@ function cpuThink(F,O){
   if(d<27&&Math.random()<.35){c.dir=-tw;F.ai.wait=10;return;}
   if(Math.random()<.18){c.guard=true;F.ai.wait=14;return;}
   const r=Math.random();c.press=r<.36?'jab':r<.6?'straight':r<.74?'hook':r<.86?'upper':'body';
-  if(c.press==='body'){c.down=true;c.press='jab';}
+
   F.ai.chain=Math.random()<lvl*.7;
 }
 
@@ -1302,7 +1313,7 @@ function makeChampCard(){
   T(ENDTXT[arc.ch.id].key,1195,'900 40px "Noto Sans KR",sans-serif','#ff4fb0');
   x.fillStyle='#151233';x.fillRect(0,1240,1080,110);
   T('@nangman.boxer',1278,'700 34px "Noto Sans KR",sans-serif','#f6efe3');
-  T('dy747.github.io/bokrini-battle  ·  v2.4',1318,'26px "Noto Sans KR",sans-serif','#a39cc9');
+  T('dy747.github.io/bokrini-battle  ·  v2.5',1318,'26px "Noto Sans KR",sans-serif','#a39cc9');
   return C;}
 
 let resScene=null;
@@ -1352,7 +1363,7 @@ function makeCard(){
   x.fillText(champ?'복린이 체육관 접수 완료 🏆':win?'나랑 붙어볼 복서 구함 👊':'누가 대신 복수 좀 👊',540,1160);
   x.fillStyle='#151233';x.fillRect(0,1232,1080,120);
   x.font='700 34px "Noto Sans KR",sans-serif';x.fillStyle='#f6efe3';x.fillText('@nangman.boxer',540,1272);
-  x.font='26px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';x.fillText('dy747.github.io/bokrini-battle  ·  v2.4',540,1314);
+  x.font='26px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';x.fillText('dy747.github.io/bokrini-battle  ·  v2.5',540,1314);
   return C;
 }
 let shotFile=null;
@@ -1431,7 +1442,7 @@ document.querySelectorAll('.b').forEach(b=>{
   b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);
 });
 document.addEventListener('contextmenu',e=>e.preventDefault());
-const KMAP={j:'jab',k:'straight',l:'hook',i:'upper',o:'super'};
+const KMAP={j:'jab',k:'straight',l:'hook',i:'upper',o:'super',m:'body'};
 addEventListener('keydown',e=>{const k=e.key.toLowerCase();if(['arrowleft','arrowright','arrowdown','arrowup',' '].includes(k))e.preventDefault();
   if(e.repeat)return;ensureAudio();
   if(mode==='select'){if(k==='arrowright')$('pick-'+CHARS[(pick+1)%4].id).click();if(k==='arrowleft')$('pick-'+CHARS[(pick+3)%4].id).click();if(k==='enter')$('goBtn').click();return;}
