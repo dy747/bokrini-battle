@@ -279,6 +279,14 @@ html.port #endBtn{align-self:center}
 .b .n{font:400 clamp(20px,calc(var(--lh,1vh)*7),30px)/1 var(--f-display)}
 .pop.cmb{font-size:calc(var(--u)*15px);color:var(--gold);text-shadow:calc(var(--u)*.8px) calc(var(--u)*.8px) 0 var(--red),0 0 calc(var(--u)*6px) rgba(255,59,85,.8);animation:cmb .9s ease-out forwards;z-index:2}
 @keyframes cmb{0%{opacity:0;transform:translate(-50%,-50%) scale(2.2) rotate(-6deg)}14%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(-6deg)}75%{opacity:1;transform:translate(-50%,-70%) scale(1) rotate(-6deg)}100%{opacity:0;transform:translate(-50%,-90%) scale(.9) rotate(-6deg)}}
+#wflash{position:absolute;inset:0;pointer-events:none;background:#fff;opacity:0}
+#wflash.on{animation:wf .22s ease-out}
+@keyframes wf{0%{opacity:.85}100%{opacity:0}}
+.cdown{display:flex;flex-direction:column;align-items:center;gap:4px}
+.cdown small{font:clamp(8px,calc(var(--lh,1vh)*2.4),12px) var(--f-px);color:var(--dim);letter-spacing:.08em}
+.cdown b{font:400 clamp(30px,calc(var(--lh,1vh)*11),56px)/1 var(--f-px);color:var(--gold);text-shadow:4px 4px 0 var(--red)}
+.cdown b.pop1{animation:slam .45s cubic-bezier(.2,1.6,.4,1)}
+@media (prefers-reduced-motion: reduce){#wflash.on{animation:none}}
 </style>
 
 </head>
@@ -312,6 +320,7 @@ html.port #endBtn{align-self:center}
   <div class="combo" id="c1" hidden></div>
   <div class="combo" id="c2" hidden></div>
   <div id="flash"></div>
+  <div id="wflash"></div>
   <div id="callout"><div id="co"></div></div>
 </div>
 
@@ -329,7 +338,7 @@ html.port #endBtn{align-self:center}
 
 <div class="ov" id="selOv">
   <div class="card">
-    <div class="selHead"><div class="selLeft"><button class="exitBtn exitTop" type="button">완전 종료</button><p class="cnt" id="cnt" aria-live="polite"></p></div><div class="logo">복린이 대전<small>ROOKIE BOXING BATTLE</small></div><p class="credit"><span>v2.3</span><a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a></p></div>
+    <div class="selHead"><div class="selLeft"><button class="exitBtn exitTop" type="button">완전 종료</button><p class="cnt" id="cnt" aria-live="polite"></p></div><div class="logo">복린이 대전<small>ROOKIE BOXING BATTLE</small></div><p class="credit"><span>v2.4</span><a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a></p></div>
     <div class="sel" id="sel"></div>
     <p class="help selhelp">콤보 <b>1-1 · 1-1-2 · 1-2 · 1-어퍼 · 훅-2 · 훅-어퍼</b> 빠르게 이어 누르기 · <b>↓</b> 숙여 피하기 · <b>뒤로/가드</b> 막기</p>
     <button class="btn" id="goBtn" type="button">링 위로 올라가기</button>
@@ -354,7 +363,8 @@ html.port #endBtn{align-self:center}
     <div class="res-sub" id="resSub"></div>
     <canvas id="resCv" width="200" height="96" aria-label="경기 결과 장면"></canvas>
     <div class="stats" id="stats"></div>
-    <div class="row">
+    <div class="cdown" id="cdown" hidden><small>NEXT CHALLENGER</small><b id="cdNum">3</b></div>
+    <div class="row" id="resBtns">
       <button class="btn ghost" id="saveBtn" type="button">📸 결과 이미지 저장</button>
       <button class="btn ghost" id="selBtn" type="button">캐릭터 다시 고르기</button>
       <button class="btn" id="againBtn" type="button">한 판 더</button>
@@ -715,6 +725,11 @@ const sfx={
   win(){[523,659,784,1047].forEach((f,i)=>osc(f,null,.14,'square',.22,sfxBus,i*.11));osc(1047,null,.55,'square',.2,sfxBus,.48);osc(784,null,.55,'square',.12,sfxBus,.48);},
   lose(){[392,370,349].forEach((f,i)=>osc(f,f*.97,.34,'triangle',.4,sfxBus,i*.38));osc(330,280,1.1,'triangle',.4,sfxBus,1.15);},
   combo(n){osc(392,null,.08,'square',.16);osc(587,null,.08,'square',.16,sfxBus,.06);osc(n>2?988:784,null,.22,'square',.18,sfxBus,.12);nz(.12,5000,.2,'highpass',1,sfxBus,.12);},
+  superStart(){osc(110,1760,.75,'sawtooth',.16);osc(220,1320,.75,'square',.06);nz(.75,600,.32,'bandpass',1,sfxBus,0,6000);
+    [523,659,784,1047].forEach((f,i)=>osc(f,null,.55,'triangle',.13,sfxBus,.6+i*.03));nz(.35,8000,.4,'highpass',1,sfxBus,.75);osc(2600,1700,.3,'sine',.22,sfxBus,.75);},
+  superHit(fin){if(fin){osc(70,24,1,'sine',1.3);osc(140,40,.55,'square',.22);nz(.7,300,1,'lowpass');nz(.3,2500,.6,'bandpass',.6);[.14,.3,.48].forEach((d,i)=>nz(.28,600,.4/(i+1),'lowpass',1,sfxBus,d));osc(1600,400,.4,'sine',.15);}
+    else{this.punch(3);nz(.07,6000,.32,'highpass');osc(1200,600,.08,'square',.08);}},
+  warn(){[0,.3,.6,.9].forEach(d=>{osc(660,null,.14,'square',.18,sfxBus,d);osc(440,null,.14,'square',.18,sfxBus,d+.15);});},
   crowd(){nz(1.4,900,.12,'bandpass',.5);nz(1.2,2400,.06,'bandpass',.7,sfxBus,.15);}
 };
 /* --- chiptune BGM (A minor, 132 BPM) --- */
@@ -764,8 +779,14 @@ const COMBOS=[{s:['jab','jab','straight'],n:'잽잽2',v:'잽 잽 투'},{s:['jab'
   {s:['jab','upper'],n:'원 어퍼',v:'원 어퍼'},{s:['hook','straight'],n:'훅 투',v:'훅 투'},{s:['hook','upper'],n:'훅 어퍼',v:'훅 어퍼'}];
 function matchCombo(seq){if(!seq||seq.length<2)return null;for(const c of COMBOS){const k=c.s.length;if(seq.length>=k&&c.s.every((m,i)=>seq[seq.length-k+i]===m))return c;}return null;}
 function startMove(F,mv){if(F.seqT!=null&&F.anim-F.seqT<=30)F.seq.push(mv);else F.seq=[mv];if(F.seq.length>4)F.seq.shift();F.seqT=F.anim;F.st='attack';F.move=mv;F.md=scaled(MOVES[mv],F.ch.spd);F.mf=0;F.hitDone=false;F.hitLanded=false;sfx.swing();}
-function startSuper(F){F.sup=0;F.st='super';F.sk=F.ch.super;F.mf=0;F.hitIdx=0;F.hitLanded=false;F.stats.supers++;superFreeze=38;
-  callout(F.ch.superName,'sup');sfx.sup();lastAtk=F;}
+const AURA={nangman:'#3f7bff',gobong:'#d8262f',pigeon:'#3fbf8a',candy:'#ff4fb0'};
+let cutIn=null,rings=[],parts=[];
+function whiteFlash(){const f=$('wflash');f.classList.remove('on');void f.offsetWidth;f.classList.add('on');}
+function burst(x,y,n,col){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,v=1+Math.random()*3.2;parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-1.2,t:0,col:i%3?col:(i%2?'#ffffff':'#ffd23a')});}}
+function startSuper(F){F.sup=0;F.st='super';F.sk=F.ch.super;F.mf=0;F.hitIdx=0;F.hitLanded=false;F.stats.supers++;superFreeze=52;
+  cutIn={F,t:0,col:AURA[F.ch.id]||'#ffd23a'};whiteFlash();shake=Math.max(shake,3);
+  callout(F.ch.superName,'sup');sfx.superStart();sayKo(F.ch.superName);lastAtk=F;
+  rings.push({x:F.x,y:GROUND-40,t:0,big:true,col:cutIn.col});}
 const isFree=F=>['idle','walk','crouch','block'].includes(F.st);
 function applyHit(A,D,h){
   if(D.st==='ko')return;
@@ -790,7 +811,9 @@ function applyHit(A,D,h){
   A.hitLanded=true;A.sup=Math.min(100,A.sup+h.gain);D.sup=Math.min(100,D.sup+h.gain*.5);
   const big=h.big||h.sup;hitstop=Math.max(hitstop,big?9:5);shake=Math.max(shake,big?4:2);
   spark(D.x-A.f*5,GROUND-(h.sy||(h.high===false&&!h.sup?36:48))+D.y,h.big?'big':'hit');popAt(String(dmg),D.x,GROUND-62);
-  sfx.punch(big?3:(h.dmg>=7?2:1));
+  if(h.sup){sfx.superHit(!!h.big);whiteFlash();const c=AURA[A.ch.id]||'#ffd23a';rings.push({x:D.x-A.f*4,y:GROUND-46,t:0,big:!!h.big,col:c});burst(D.x-A.f*4,GROUND-46,h.big?34:10,c);
+    if(h.big){hitstop=Math.max(hitstop,18);shake=Math.max(shake,9);}}
+  else sfx.punch(big?3:(h.dmg>=7?2:1));
   if(D===P1){flash();buzz(big?60:30);} else buzz(big?25:12);
   lastAtk=A;
   if(D.hp<=0){D.hp=0;doKO(A,D);}
@@ -878,7 +901,10 @@ function startMatch(){
   startStage();
 }
 function stageLabel(i){return i===arc.ladder.length-1?'FINAL BOSS':`STAGE ${i+1}`;}
-function startStage(){
+let nextTimers=[];
+function later(ms,fn){nextTimers.push(setTimeout(fn,ms));}
+function clearLater(){nextTimers.forEach(clearTimeout);nextTimers=[];}
+function startStage(next){
   const ch=arc.ch,oc=arc.ladder[arc.stage];
   resScene=null;$('shotOv').hidden=true;
   P1=newFighter(ch,110,1,false);P2=newFighter(oc,210,-1,true);round=1;
@@ -886,11 +912,16 @@ function startStage(){
   drawPortrait($('por1'),P1.ch,1);drawPortrait($('por2'),P2.ch,-1);
   $('n1').textContent=ch.name;$('n2').textContent=oc.name;
   ['selOv','resOv','pauseOv'].forEach(id=>$(id).hidden=true);$('ctl').hidden=false;
-  callout(`${stageLabel(arc.stage)}\n${ch.name} VS ${oc.name}`,'vs');$('co').style.whiteSpace='pre-line';
+  $('co').style.whiteSpace='pre-line';
+  if(next){P2.entering=true;arc.nextIntro=true;
+    if(P2.boss){callout('WARNING!\nFINAL BOSS','vs');sfx.warn();say('Warning! Final boss!',.9,.5);}
+    else{callout('NEXT\nCHALLENGER!','vs');say('Here comes a new challenger!',1,.6);}}
+  else{arc.nextIntro=false;callout(`${stageLabel(arc.stage)}\n${ch.name} VS ${oc.name}`,'vs');}
   startRound(true);
+  if(next){introT=210;P2.x=W+26;}
 }
 function startRound(first){
-  ensureAudio();bgm(true);
+  ensureAudio();bgm(true);rings=[];parts=[];cutIn=null;
   for(const [F,x,f] of [[P1,110,1],[P2,210,-1]]){Object.assign(F,{x,f,y:0,vx:0,vy:0,hp:F.ch.hp,st:'idle',combo:0,buf:null,bufT:0,koT:0,mf:0});F.ctrl.press=null;}
   P2.ai.lvl=Math.min(.92,.48+arc.stage*.14+(round-1)*.08);if(P2.boss){P2.hp=Math.round(P2.ch.hp*1.2);}timer=60;projs=[];sparks=[];rWin=null;hitstop=0;superFreeze=0;
   mode='intro';introT=first?150:100;dr1=100;dr2=100;
@@ -911,9 +942,10 @@ function afterRound(){
 let dr1=100,dr2=100;
 function step(){
   if(paused||mode==='select'||mode==='result')return;
-  if(superFreeze>0){superFreeze--;if(superFreeze===0)clearCallout();return;}
+  if(superFreeze>0){superFreeze--;if(cutIn)cutIn.t++;for(const r of rings)r.t+=.5;if(superFreeze===0){clearCallout();cutIn=null;}return;}
   if(hitstop>0){hitstop--;return;}
   if(mode==='intro'){introT--;
+    if(introT===150&&arc.nextIntro)callout(`${stageLabel(arc.stage)}\n${P1.ch.name} VS ${P2.ch.name}`,'vs');
     if(introT===95){callout(round===3?'FINAL ROUND':`ROUND ${round}`);say(round===3?'Final round':'Round '+['','one','two','three'][round]);}
     if(introT===35){callout('BOX!');say('Box!',1.05,.6);sfx.bell();}
     if(introT<=0){mode='fight';clearCallout();}
@@ -932,12 +964,15 @@ function step(){
   updateFighter(P1,P2);updateFighter(P2,P1);
   // push apart
   if(P1.st!=='ko'&&P2.st!=='ko'){const dx=P2.x-P1.x,ad=Math.abs(dx);if(ad<26){const o=(26-ad)/2*(dx>=0?1:-1);P1.x-=o;P2.x+=o;}}
-  for(const F of [P1,P2])F.x=clamp(F.x,WALL_L,WALL_R);
+  if(P2.entering){P2.x-=2.4;P2.f=-1;P2.st='walk';P2.walkT+=1.6;if(P2.x<=210){P2.x=210;P2.entering=false;P2.st='idle';}}
+  for(const F of [P1,P2])if(!F.entering)F.x=clamp(F.x,WALL_L,WALL_R);
   // projectiles
   for(const p of projs){p.x+=p.vx;p.t++;const T=p.owner===P1?P2:P1;
     if(!p.done&&T.st!=='ko'&&Math.abs(p.x-T.x)<10){p.done=true;applyHit(p.owner,T,{dmg:6,kb:1.6,hs:14,high:false,gain:0,sup:true});}}
   projs=projs.filter(p=>!p.done&&p.x>-20&&p.x<W+20);
   for(const s of sparks)s.t++;sparks=sparks.filter(s=>s.t<10);
+  for(const r of rings)r.t++;rings=rings.filter(r=>r.t<(r.big?18:11));
+  for(const q of parts){q.t++;q.x+=q.vx;q.y+=q.vy;q.vy+=.18;q.vx*=.97;}parts=parts.filter(q=>q.t<34&&q.y<GROUND+4);
   shake*=.86;
 }
 
@@ -959,15 +994,39 @@ function render(){
   if(!RM&&shake>.3)ctx.translate(Math.round(rand(-shake,shake)),Math.round(rand(-shake,shake)));
   ctx.drawImage(bg,0,0);
   if(!P1)return;
-  if(superFreeze>0){ctx.fillStyle='rgba(10,0,30,.55)';ctx.fillRect(-10,-10,W+20,H+20);}
+  if(superFreeze>0){ctx.fillStyle='rgba(6,0,20,.62)';ctx.fillRect(-10,-10,W+20,H+20);}
+  for(const F of [P1,P2])if(F.st==='super'||(superFreeze>0&&cutIn&&cutIn.F===F)){ // aura + afterimages
+    const c=AURA[F.ch.id]||'#ffd23a',fl=(F.anim>>1)%2;ctx.globalAlpha=.28+.14*fl;ctx.fillStyle=c;
+    ctx.beginPath();ctx.ellipse(F.x,GROUND-34+F.y,22+fl*2,40+fl*2,0,0,7);ctx.fill();ctx.globalAlpha=.3;
+    if(F.st==='super'){drawFighter(ctx,F,F.x-F.f*10,GROUND+F.y);ctx.globalAlpha=.15;drawFighter(ctx,F,F.x-F.f*20,GROUND+F.y);}
+    ctx.globalAlpha=1;}
   for(const F of [P1,P2]){ctx.fillStyle='rgba(0,0,0,.35)';ctx.fillRect(Math.round(F.x-12),GROUND-1,24,3);}
   const order=lastAtk===P1?[P2,P1]:[P1,P2];
   for(const F of order)drawFighter(ctx,F,F.x,GROUND+F.y);
   for(const p of projs)drawPigeonBird(p);
+  for(const r of rings){const k=r.t/(r.big?18:11);ctx.globalAlpha=1-k;ctx.strokeStyle=r.col||'#fff';ctx.lineWidth=r.big?3:2;ctx.beginPath();ctx.ellipse(r.x,r.y,4+r.t*(r.big?5:3),3+r.t*(r.big?3.4:2),0,0,7);ctx.stroke();
+    if(r.big){ctx.strokeStyle='#ffffff';ctx.lineWidth=1;ctx.beginPath();ctx.ellipse(r.x,r.y,2+r.t*3.4,2+r.t*2.2,0,0,7);ctx.stroke();}}
+  ctx.globalAlpha=1;for(const q of parts){ctx.fillStyle=q.col;ctx.fillRect(Math.round(q.x),Math.round(q.y),q.t<10?2:1,q.t<10?2:1);}
+  if(superFreeze>0&&cutIn)drawCutIn(cutIn);
   ctx.setTransform(1,0,0,1,0,0);
   for(const s of sparks)drawSpark(s);
 }
 
+/* super cut-in: speed lines + sliding portrait band */
+const cutHead=document.createElement('canvas');cutHead.width=26;cutHead.height=26;
+function drawCutIn(c){
+  const t=c.t,F=c.F,dir=F===P1?1:-1;
+  ctx.globalAlpha=.55;ctx.fillStyle='#ffffff';
+  for(let i=0;i<26;i++){const y=(i*37+t*7)%H,len=20+(i*13)%40,x=((i*71+t*(9+i%4)*dir)%(W+80)+W+80)%(W+80)-40;ctx.fillRect(Math.round(x),y,len,1);}
+  ctx.globalAlpha=1;
+  const by=58,bh=46,k=Math.min(1,t/7);ctx.fillStyle=c.col;ctx.fillRect(0,by,W,bh);
+  ctx.fillStyle='rgba(0,0,0,.25)';for(let x=-bh;x<W;x+=12)ctx.fillRect(((x+t*4*dir)%(W+bh)+W+bh)%(W+bh)-bh,by,6,bh);
+  ctx.fillStyle='#ffffff';ctx.fillRect(0,by,W,2);ctx.fillRect(0,by+bh-2,W,2);
+  const hx=cutHead.getContext('2d');hx.imageSmoothingEnabled=false;hx.clearRect(0,0,26,26);org(hx,dir>0?11:15,15,dir);drawHead(F.ch,0,0,{st:'win',anim:t});
+  const s=3,px=dir>0?Math.round(-90+(W*0.28+90)*k):Math.round(W+90-(W*0.28+90)*k)-26*s;
+  ctx.imageSmoothingEnabled=false;ctx.drawImage(cutHead,px,by-14,26*s,26*s);
+  if(t<4){ctx.globalAlpha=.8-t*.2;ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);ctx.globalAlpha=1;}
+}
 /* ================= HUD ================= */
 function drawPortrait(c,ch,f){const x=c.getContext('2d');x.imageSmoothingEnabled=false;x.clearRect(0,0,20,20);
   x.fillStyle=f>0?'#5a1f3a':'#1f2a5a';x.fillRect(0,0,20,20);org(x,f>0?9:11,12,f);drawHead(ch,0,0,null);}
@@ -1025,12 +1084,13 @@ function showResult(){
   const win=P1.wins>P2.wins,last=arc.stage===arc.ladder.length-1,champ=win&&last;
   for(const k in arc.tot)arc.tot[k]=k==='max'?Math.max(arc.tot.max,P1.stats.max):arc.tot[k]+P1.stats[k];
   arc.result=champ?'champ':win?'clear':'lose';
-  $('resHead').textContent=champ?'CHAMPION!':win?`${stageLabel(arc.stage)} CLEAR!`:'패배…';
+  $('resHead').textContent=champ?'CHAMPION!':win?`${stageLabel(arc.stage)} CLEAR!`:'GAME OVER';
   $('resHead').className='res-head '+(win?'win':'lose');
   $('resSub').textContent=champ?`${P1.ch.name} · 3연승으로 복린이 체육관 챔피언 등극!`
     :win?`${P1.ch.name} ${P1.wins} : ${P2.wins} ${P2.ch.name}  →  다음 상대 ${last?'':(arc.stage+1===arc.ladder.length-1?'FINAL BOSS ':'')}${arc.ladder[arc.stage+1].name}`
     :`${P1.ch.name} ${P1.wins} : ${P2.wins} ${P2.ch.name}  ·  ${stageLabel(arc.stage)}에서 탈락`;
-  $('againBtn').textContent=champ?'처음부터 다시':win?'다음 상대 ▶':'이 상대에게 재도전';
+  $('resBtns').hidden=win&&!champ;$('cdown').hidden=true;
+  $('againBtn').textContent='처음부터 다시';
   const s=champ?arc.tot:P1.stats;
   $('stats').innerHTML=`<div><span>최대 콤보</span><b>${s.max}</b></div><div><span>카운터</span><b>${s.counters}</b></div><div><span>필살기</span><b>${s.supers}</b></div><div><span>준 데미지</span><b>${s.dealt}</b></div>`;
   const rc=$('resCv');
@@ -1040,6 +1100,11 @@ function showResult(){
   rc.width=200;rc.height=96;rc.style.aspectRatio='';
   resScene={a:{ch:P1.ch,st:win?'win':'cry',anim:0,f:1,ctrl:{},y:0,mf:0,walkT:0},b:{ch:P2.ch,st:win?'cry':'win',anim:40,f:-1,ctrl:{},y:0,mf:0,walkT:0},win};
   $('resOv').hidden=false;
+  if(win){ // show the result for a moment, then 3-2-1 into the next challenger
+    later(2300,()=>{$('cdown').hidden=false;
+      [3,2,1].forEach((n,i)=>later(i*900,()=>{const b=$('cdNum');b.textContent=n;b.classList.remove('pop1');void b.offsetWidth;b.classList.add('pop1');osc(880,null,.09,'square',.18);}));
+      later(2700,()=>{osc(1320,null,.25,'square',.2);$('resOv').hidden=true;arc.stage++;startStage(true);});});
+  }else{say('Game over',.8,.45);}
 }
 /* ================= champion endings: 160x120 crisp pixel art ================= */
 const EW=160,EH=120;
@@ -1237,7 +1302,7 @@ function makeChampCard(){
   T(ENDTXT[arc.ch.id].key,1195,'900 40px "Noto Sans KR",sans-serif','#ff4fb0');
   x.fillStyle='#151233';x.fillRect(0,1240,1080,110);
   T('@nangman.boxer',1278,'700 34px "Noto Sans KR",sans-serif','#f6efe3');
-  T('dy747.github.io/bokrini-battle  ·  v2.3',1318,'26px "Noto Sans KR",sans-serif','#a39cc9');
+  T('dy747.github.io/bokrini-battle  ·  v2.4',1318,'26px "Noto Sans KR",sans-serif','#a39cc9');
   return C;}
 
 let resScene=null;
@@ -1287,7 +1352,7 @@ function makeCard(){
   x.fillText(champ?'복린이 체육관 접수 완료 🏆':win?'나랑 붙어볼 복서 구함 👊':'누가 대신 복수 좀 👊',540,1160);
   x.fillStyle='#151233';x.fillRect(0,1232,1080,120);
   x.font='700 34px "Noto Sans KR",sans-serif';x.fillStyle='#f6efe3';x.fillText('@nangman.boxer',540,1272);
-  x.font='26px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';x.fillText('dy747.github.io/bokrini-battle  ·  v2.3',540,1314);
+  x.font='26px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';x.fillText('dy747.github.io/bokrini-battle  ·  v2.4',540,1314);
   return C;
 }
 let shotFile=null;
@@ -1306,7 +1371,7 @@ $('shotShare').addEventListener('click',async()=>{
   try{const a=document.createElement('a');a.href=$('shotImg').src;a.download='bokrini-battle.png';document.body.appendChild(a);a.click();a.remove();}catch(e){}
   toast(isIOS?"이미지를 길게 눌러 '사진에 저장'을 누르세요":'저장이 안 되면 이미지를 길게 눌러 저장하세요');
 });
-function toSelect(){resScene=null;$('endOv').hidden=true;$('shotOv').hidden=true;bgm(false);mode='select';paused=false;P1=null;['resOv','pauseOv'].forEach(id=>$(id).hidden=true);$('ctl').hidden=true;$('selOv').hidden=false;clearCallout();$('pops').innerHTML='';}
+function toSelect(){clearLater();resScene=null;$('endOv').hidden=true;$('shotOv').hidden=true;bgm(false);mode='select';paused=false;P1=null;['resOv','pauseOv'].forEach(id=>$(id).hidden=true);$('ctl').hidden=true;$('selOv').hidden=false;clearCallout();$('pops').innerHTML='';}
 /* challenger counter (free Abacus counting API; silently hidden if unreachable) */
 const CNT_API='https://abacus.jasoncameron.dev',CNT_NS='dy747.github.io-bokrini';
 const kstDay=()=>new Date(Date.now()+9*36e5).toISOString().slice(0,10).replace(/-/g,'');
@@ -1321,9 +1386,8 @@ async function countChallenger(){ // once per device per day
   const [a,b]=await Promise.all([cntCall('hit','day-'+day),cntCall('hit','total')]);
   if(a!=null)cnt.today=a;if(b!=null)cnt.total=b;showCnt();}
 $('goBtn').addEventListener('click',()=>{ensureAudio();countChallenger();startMatch();});
-$('againBtn').addEventListener('click',()=>{resScene=null;$('endOv').hidden=true;$('shotOv').hidden=true;ensureAudio();
-  if(!arc||arc.result==='champ')return startMatch();
-  if(arc.result==='clear')arc.stage++;
+$('againBtn').addEventListener('click',()=>{clearLater();resScene=null;$('endOv').hidden=true;$('shotOv').hidden=true;ensureAudio();
+  return startMatch();
   startStage();});
 $('selBtn').addEventListener('click',toSelect);
 $('quitBtn').addEventListener('click',toSelect);
@@ -1442,7 +1506,7 @@ document.addEventListener('visibilitychange',()=>{
   if(document.hidden&&(mode==='fight'||mode==='intro'||mode==='end')&&!paused){paused=true;bgm(false);$('pauseOv').hidden=false;}
 });
 /* 완전 종료: back to a fresh first screen, then try to close the in-app browser */
-function exitGame(){
+function exitGame(){clearLater();
   try{sessionStorage.setItem('bk-exited','1')}catch(e){}
   bgm(false);try{unlockEl&&unlockEl.pause()}catch(e){}
   try{window.close()}catch(e){}
