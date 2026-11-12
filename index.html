@@ -76,7 +76,17 @@ body{margin:0;background:var(--bg);color:var(--chalk);font-family:var(--f-body);
 .mid span{font-family:var(--f-px);font-size:calc(var(--u)*11px);color:var(--gold);text-shadow:0 calc(var(--u)*1px) 0 #8a3d00;display:block;margin-top:calc(var(--u)*2px);font-variant-numeric:tabular-nums}
 #exitHud{position:absolute;left:calc(var(--u)*48px);top:calc(var(--u)*30px);height:calc(var(--u)*11px);padding:0 calc(var(--u)*3px);background:rgba(60,10,20,.7);border:1px solid var(--red);color:#fff;font:900 calc(var(--u)*5px) var(--f-body);cursor:pointer}
 .exitBtn.exitTop{justify-self:start;align-self:start;white-space:nowrap;width:max-content;height:auto;min-width:0;line-height:1.2;background:transparent;border:2px solid var(--red);color:#ff8a96;font:900 13px var(--f-body);padding:7px 12px;cursor:pointer}
-html.port .exitBtn.exitTop{position:absolute;top:0;left:0;padding:3px 9px;font-size:11px}
+html.port .exitBtn.exitTop{padding:3px 9px;font-size:11px}
+.selLeft{justify-self:start;align-self:start;display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-width:0;position:relative;z-index:2}
+html.port .selLeft{position:absolute;top:0;left:0;flex-direction:row;align-items:center;gap:8px}
+html.port .cnt br{display:none}
+html.port .cnt i{font-style:normal;padding:0 3px}
+.cnt{margin:0;font-size:9px;line-height:1.45;color:var(--dim);opacity:.5;font-weight:700;white-space:nowrap;text-align:left;font-variant-numeric:tabular-nums}
+.cnt b{color:var(--chalk);font-weight:900}
+.cnt i{font-style:normal;display:none}
+.cnt u{text-decoration:none}
+html.port .cnt u{display:none}
+html.port .cnt i{display:inline}
 #sndBtn{position:absolute;left:calc(var(--u)*34px);top:calc(var(--u)*30px);width:calc(var(--u)*11px);height:calc(var(--u)*11px);background:rgba(10,8,30,.6);border:1px solid var(--chalk);padding:0;cursor:pointer;font-size:calc(var(--u)*5.5px);line-height:1}
 #fsBtn{position:absolute;left:calc(var(--u)*20px);top:calc(var(--u)*30px);width:calc(var(--u)*11px);height:calc(var(--u)*11px);background:rgba(10,8,30,.6);border:1px solid var(--chalk);color:var(--chalk);font:900 calc(var(--u)*6px) var(--f-body);padding:0;cursor:pointer;line-height:1}
 #toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 24px);transform:translateX(-50%);z-index:30;max-width:calc(100% - 32px);box-sizing:border-box;background:#1d1840;border:2px solid var(--gold);color:var(--chalk);font:700 13px/1.5 var(--f-body);padding:10px 14px;text-align:center}
@@ -316,7 +326,7 @@ html.port #endBtn{align-self:center}
 
 <div class="ov" id="selOv">
   <div class="card">
-    <div class="selHead"><button class="exitBtn exitTop" type="button">완전 종료</button><div class="logo">복린이 대전<small>ROOKIE BOXING BATTLE</small></div><p class="credit"><span>v2.1</span><a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a></p></div>
+    <div class="selHead"><div class="selLeft"><button class="exitBtn exitTop" type="button">완전 종료</button><p class="cnt" id="cnt" aria-live="polite"></p></div><div class="logo">복린이 대전<small>ROOKIE BOXING BATTLE</small></div><p class="credit"><span>v2.2</span><a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a></p></div>
     <div class="sel" id="sel"></div>
     <p class="help selhelp"><b>↓</b> 숙이면 펀치 회피 · <b>뒤로 당기기/가드</b> 막기 · 펀치 <b>이어 누르면 콤보</b> · 게이지 차면 <b>SUPER</b> · 3판 2선승</p>
     <button class="btn" id="goBtn" type="button">링 위로 올라가기</button>
@@ -1210,7 +1220,7 @@ function makeChampCard(){
   T(ENDTXT[arc.ch.id].key,1195,'900 40px "Noto Sans KR",sans-serif','#ff4fb0');
   x.fillStyle='#151233';x.fillRect(0,1240,1080,110);
   T('@nangman.boxer',1278,'700 34px "Noto Sans KR",sans-serif','#f6efe3');
-  T('dy747.github.io/bokrini-battle  ·  v2.1',1318,'26px "Noto Sans KR",sans-serif','#a39cc9');
+  T('dy747.github.io/bokrini-battle  ·  v2.2',1318,'26px "Noto Sans KR",sans-serif','#a39cc9');
   return C;}
 
 let resScene=null;
@@ -1260,7 +1270,7 @@ function makeCard(){
   x.fillText(champ?'복린이 체육관 접수 완료 🏆':win?'나랑 붙어볼 복서 구함 👊':'누가 대신 복수 좀 👊',540,1160);
   x.fillStyle='#151233';x.fillRect(0,1232,1080,120);
   x.font='700 34px "Noto Sans KR",sans-serif';x.fillStyle='#f6efe3';x.fillText('@nangman.boxer',540,1272);
-  x.font='26px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';x.fillText('dy747.github.io/bokrini-battle  ·  v2.1',540,1314);
+  x.font='26px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';x.fillText('dy747.github.io/bokrini-battle  ·  v2.2',540,1314);
   return C;
 }
 let shotFile=null;
@@ -1280,7 +1290,20 @@ $('shotShare').addEventListener('click',async()=>{
   toast(isIOS?"이미지를 길게 눌러 '사진에 저장'을 누르세요":'저장이 안 되면 이미지를 길게 눌러 저장하세요');
 });
 function toSelect(){resScene=null;$('endOv').hidden=true;$('shotOv').hidden=true;bgm(false);mode='select';paused=false;P1=null;['resOv','pauseOv'].forEach(id=>$(id).hidden=true);$('ctl').hidden=true;$('selOv').hidden=false;clearCallout();$('pops').innerHTML='';}
-$('goBtn').addEventListener('click',()=>{ensureAudio();startMatch();});
+/* challenger counter (free Abacus counting API; silently hidden if unreachable) */
+const CNT_API='https://abacus.jasoncameron.dev',CNT_NS='dy747.github.io-bokrini';
+const kstDay=()=>new Date(Date.now()+9*36e5).toISOString().slice(0,10).replace(/-/g,'');
+const cnt={today:null,total:null};
+function showCnt(){if(cnt.today==null||cnt.total==null)return;$('cnt').innerHTML=`오늘의 도전자 <b>${cnt.today.toLocaleString()}</b><br><i>·</i>누적<u> 도전자</u> <b>${cnt.total.toLocaleString()}</b>`;}
+async function cntCall(kind,key){try{const r=await fetch(`${CNT_API}/${kind}/${CNT_NS}/${key}`,{cache:'no-store'});if(r.status===404)return 0;if(!r.ok)return null;const j=await r.json();return typeof j.value==='number'?j.value:null;}catch(e){return null;}}
+(async()=>{const [a,b]=await Promise.all([cntCall('get','day-'+kstDay()),cntCall('get','total')]);if(a!=null&&b!=null){cnt.today=a;cnt.total=b;showCnt();}})();
+let countedSession=false;
+async function countChallenger(){ // once per device per day
+  const day=kstDay();let seen=null;try{seen=localStorage.getItem('bk-day')}catch(e){}
+  if(seen===day||countedSession)return;countedSession=true;try{localStorage.setItem('bk-day',day)}catch(e){}
+  const [a,b]=await Promise.all([cntCall('hit','day-'+day),cntCall('hit','total')]);
+  if(a!=null)cnt.today=a;if(b!=null)cnt.total=b;showCnt();}
+$('goBtn').addEventListener('click',()=>{ensureAudio();countChallenger();startMatch();});
 $('againBtn').addEventListener('click',()=>{resScene=null;$('endOv').hidden=true;$('shotOv').hidden=true;ensureAudio();
   if(!arc||arc.result==='champ')return startMatch();
   if(arc.result==='clear')arc.stage++;
