@@ -117,12 +117,12 @@ html.port .exitBtn.exitTop{position:absolute;top:0;left:0;padding:3px 9px;font-s
 #joy::after{border-left-color:rgba(255,255,255,.7);transform:translate(calc(-50% + clamp(36px,calc(var(--lh,1vh) * 11),52px)),-50%)}
 #joy{opacity:.38;transition:opacity .15s}
 /* rotated on a portrait phone: keep the joystick clear of the in-app browser's floating close button (physical top-left) */
-html.rot #joy{left:110px}
+html.rot #joy{left:26px}
 /* rotated: map the phone's physical safe areas onto the rotated sides and leave breathing room at the (logical) top */
 html.rot .ov{padding:calc(env(safe-area-inset-right,0px) + 30px) max(16px,calc(env(safe-area-inset-bottom,0px) + 12px)) calc(env(safe-area-inset-left,0px) + 18px) max(16px,calc(env(safe-area-inset-top,0px) + 10px))}
 html.rot #selOv>.card{gap:calc(var(--lh,1vh)*2.4)}
 html.rot .sel{flex-basis:calc(var(--lh,1vh)*56)}
-html.rot #btns{right:calc(env(safe-area-inset-bottom,0px) + 14px)}
+html.rot #btns{right:calc(env(safe-area-inset-bottom,0px) + 6px);bottom:calc(env(safe-area-inset-left,0px) + 4px)}
 #joy.on{opacity:.8}
 #knob{position:absolute;left:50%;top:50%;width:42%;aspect-ratio:1;border-radius:50%;transform:translate(-50%,-50%);
   background:radial-gradient(circle at 35% 30%,#e9ecff,#7f86b5 60%,#3b3f66);box-shadow:0 3px 8px rgba(0,0,0,.6)}
@@ -247,11 +247,12 @@ html.short .stat{gap:1px 6px}
 #btns .b[data-k=guard],#btns .b[data-k=super]{align-self:center;width:100%;aspect-ratio:1;height:auto}
 html.port #btns .b[data-k=guard],html.port #btns .b[data-k=super]{align-self:stretch;aspect-ratio:auto}
 /* joystick: lower and smaller so it covers less; while held, the ring nearly vanishes and only the knob shows */
-#joy{bottom:calc(env(safe-area-inset-bottom,0px) + 4px);width:clamp(96px,calc(var(--lh,1vh) * 30),136px)}
+#joy{left:max(16px,calc(env(safe-area-inset-left,0px) + 10px));bottom:calc(env(safe-area-inset-bottom,0px) + 2px);width:clamp(96px,calc(var(--lh,1vh) * 30),136px)}
 html.port #joy{bottom:calc(env(safe-area-inset-bottom,0px) + 34px)}
 #joy.on{opacity:1;background:transparent;border-color:rgba(110,150,255,.12);box-shadow:none}
 #joy.on::before,#joy.on::after{opacity:0}
 #joy.on #knob{opacity:.6}
+#btns{right:max(8px,calc(env(safe-area-inset-right,0px) + 4px));bottom:calc(env(safe-area-inset-bottom,0px) + 4px)}
 </style>
 
 </head>
@@ -302,7 +303,7 @@ html.port #joy{bottom:calc(env(safe-area-inset-bottom,0px) + 34px)}
 
 <div class="ov" id="selOv">
   <div class="card">
-    <div class="selHead"><button class="exitBtn exitTop" type="button">완전 종료</button><div class="logo">복린이 대전<small>ROOKIE BOXING BATTLE</small></div><p class="credit"><span>v1.7</span><a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a></p></div>
+    <div class="selHead"><button class="exitBtn exitTop" type="button">완전 종료</button><div class="logo">복린이 대전<small>ROOKIE BOXING BATTLE</small></div><p class="credit"><span>v1.8</span><a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a></p></div>
     <div class="sel" id="sel"></div>
     <p class="help selhelp"><b>↓</b> 숙이면 펀치 회피 · <b>뒤로 당기기/가드</b> 막기 · 펀치 <b>이어 누르면 콤보</b> · 게이지 차면 <b>SUPER</b> · 3판 2선승</p>
     <button class="btn" id="goBtn" type="button">링 위로 올라가기</button>
@@ -425,7 +426,7 @@ function fist(ch,x,y,rear){
 function face(ch,cx,cy,w=11){R(cx-5,cy-6,w,12,ch.skin);R(cx+w-5,cy-1,2,3,ch.skin);R(cx-3,cy+5,6,4,ch.skin);R(cx-2,cy-1,2,3,ch.skinD);}
 function drawHead(ch,cx,cy,F){
   const hurt=F&&(F.st==='hitstun'||F.st==='ko');
-  const cry=F&&F.st==='cry',joy=F&&F.st==='win';
+  const cry=F&&F.st==='cry',joy=F&&(F.st==='win'||F.st==='champ');
   const eye=(x,y)=>{if(cry){R(x,y+1,3,1,'#111');R(x,y,1,1,'#111');}else if(joy){R(x,y+1,1,1,'#111');R(x+1,y,1,1,'#111');R(x+2,y+1,1,1,'#111');}
                     else if(F&&F.st==='ko'){R(x,y,1,1,'#111');R(x+2,y,1,1,'#111');R(x+1,y+1,1,1,'#111');R(x,y+2,1,1,'#111');R(x+2,y+2,1,1,'#111');}
                     else if(hurt)R(x,y+1,3,1,'#111');else R(x+1,y,2,2,'#141418');};
@@ -506,6 +507,7 @@ function pose(F){
       else if(F.hitBy==='hook'){p.lean=-5;p.fr=[8,-44];p.rr=[3,-42];p.tilt=-3;}
       else{p.lean=-4;p.fr=[9,-43];p.rr=[5,-41];p.tilt=-1;}break;
     case 'ko':p.lean=-5;p.fr=[4,-40];p.rr=[0,-38];break;
+    case 'champ':{const w=Math.round(Math.sin((F.anim||0)*.12));p.rr=[3,-74+w];p.fr=[8,-74+w];p.trophy=true;break;}
     case 'win':{const w=Math.sin((F.anim||0)*.3)*2;p.rr=[1,-76+w];p.fr=[8,-75-w];break;}
     case 'cry':{const k=Math.round(Math.sin((F.anim||0)*.45)*1.5);p.sit=true;p.lean=2;p.fr=[10,-11+k];p.rr=[7,-10-k];break;}
     case 'attack':{
@@ -582,6 +584,9 @@ function drawFighter(c,F,x,y){
   if(ch.top==='tee'){R(lean-2,shY,6,2,'#2a2a30');}
   // head
   drawHead(ch,lean+1+p.tilt,shY-8,F);
+  if(p.trophy){const ty=p.fr[1]+cr-4,gd='#ffd23a',gd2='#c8930a',gl='#fff3b0'; // gold cup held over the head
+    R(1,ty-14,14,8,gd);R(2,ty-6,12,2,gd);R(4,ty-4,8,1,gd2);R(6,ty-3,4,3,gd2);R(3,ty,10,2,gd);R(4,ty+2,8,1,gd2);
+    R(-1,ty-13,2,5,gd2);R(15,ty-13,2,5,gd2);R(3,ty-13,2,5,gl);R(1,ty-15,14,1,gl);R(7,ty-11,2,2,'#ff3b55');}
   // front arm
   arm(sF,gF,false,p.hookE);
   c.restore();
@@ -665,6 +670,7 @@ const sfx={
   coo(){osc(520,380,.1,'triangle',.18);osc(480,360,.1,'triangle',.14,sfxBus,.13);},
   blip(){osc(880,1320,.06,'square',.12)},
   ko(){osc(70,28,.6,'sine',1.2);nz(.5,250,.8,'lowpass');},
+  champ(){const N=[[523,0,.12],[523,.13,.12],[523,.26,.12],[659,.4,.5],[587,.95,.18],[659,1.15,.18],[784,1.35,.9]];N.forEach(([f,at,d])=>{osc(f,null,d,'square',.24,sfxBus,at);osc(f/2,null,d,'triangle',.2,sfxBus,at);});[0,.4,1.35].forEach(at=>nz(.2,6000,.25,'highpass',1,sfxBus,at));this.crowd();},
   win(){[523,659,784,1047].forEach((f,i)=>osc(f,null,.14,'square',.22,sfxBus,i*.11));osc(1047,null,.55,'square',.2,sfxBus,.48);osc(784,null,.55,'square',.12,sfxBus,.48);},
   lose(){[392,370,349].forEach((f,i)=>osc(f,f*.97,.34,'triangle',.4,sfxBus,i*.38));osc(330,280,1.1,'triangle',.4,sfxBus,1.15);},
   crowd(){nz(1.4,900,.12,'bandpass',.5);nz(1.2,2400,.06,'bandpass',.7,sfxBus,.15);}
@@ -812,26 +818,37 @@ function cpuThink(F,O){
 }
 
 /* ================= rounds ================= */
+/* arcade ladder: beat the other 3 boxers in a row; the 3rd is the FINAL BOSS */
+let arc=null;
 function startMatch(){
-  const ch=CHARS[pick];const others=CHARS.filter((_,i)=>i!==pick);const oc=others[Math.random()*others.length|0];
+  const ch=CHARS[pick],others=CHARS.filter((_,i)=>i!==pick);
+  for(let i=others.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[others[i],others[j]]=[others[j],others[i]];}
+  arc={ch,ladder:others,stage:0,tot:{max:0,counters:0,supers:0,dealt:0}};
+  startStage();
+}
+function stageLabel(i){return i===arc.ladder.length-1?'FINAL BOSS':`STAGE ${i+1}`;}
+function startStage(){
+  const ch=arc.ch,oc=arc.ladder[arc.stage];
+  resScene=null;$('shotOv').hidden=true;
   P1=newFighter(ch,110,1,false);P2=newFighter(oc,210,-1,true);round=1;
+  if(arc.stage===arc.ladder.length-1){P2.boss=true;}
   drawPortrait($('por1'),P1.ch,1);drawPortrait($('por2'),P2.ch,-1);
   $('n1').textContent=ch.name;$('n2').textContent=oc.name;
   ['selOv','resOv','pauseOv'].forEach(id=>$(id).hidden=true);$('ctl').hidden=false;
-  callout(`${ch.name}\nVS\n${oc.name}`,'vs');$('co').style.whiteSpace='pre-line';
+  callout(`${stageLabel(arc.stage)}\n${ch.name} VS ${oc.name}`,'vs');$('co').style.whiteSpace='pre-line';
   startRound(true);
 }
 function startRound(first){
   ensureAudio();bgm(true);
   for(const [F,x,f] of [[P1,110,1],[P2,210,-1]]){Object.assign(F,{x,f,y:0,vx:0,vy:0,hp:F.ch.hp,st:'idle',combo:0,buf:null,bufT:0,koT:0,mf:0});F.ctrl.press=null;}
-  P2.ai.lvl=.5+(round-1)*.1;timer=60;projs=[];sparks=[];rWin=null;hitstop=0;superFreeze=0;
+  P2.ai.lvl=Math.min(.92,.48+arc.stage*.14+(round-1)*.08);if(P2.boss){P2.hp=Math.round(P2.ch.hp*1.2);}timer=60;projs=[];sparks=[];rWin=null;hitstop=0;superFreeze=0;
   mode='intro';introT=first?150:100;dr1=100;dr2=100;
 }
 function roundOver(A){
   if(mode!=='fight')return;mode='end';endT=0;rWin=A;if(A)A.wins++;
 }
 function timeOver(){
-  const a=P1.hp/P1.ch.hp,b=P2.hp/P2.ch.hp;callout('TIME OVER');say('Time!');sfx.bell();
+  const a=P1.hp/P1.ch.hp,b=P2.hp/(P2.ch.hp*(P2.boss?1.2:1));callout('TIME OVER');say('Time!');sfx.bell();
   roundOver(a>b?P1:b>a?P2:null);
 }
 function afterRound(){
@@ -906,7 +923,7 @@ function drawPortrait(c,ch,f){const x=c.getContext('2d');x.imageSmoothingEnabled
 const el={h1:$('h1'),h2:$('h2'),d1:$('d1'),d2:$('d2'),s1:$('s1'),s2:$('s2'),sb1:$('sb1'),sb2:$('sb2'),t:$('time'),c1:$('c1'),c2:$('c2'),sup:$('supBtn'),w1:$('w1'),w2:$('w2')};
 function hud(){
   if(!P1)return;
-  const a=Math.max(0,P1.hp/P1.ch.hp*100),b=Math.max(0,P2.hp/P2.ch.hp*100);
+  const a=Math.max(0,P1.hp/P1.ch.hp*100),b=Math.max(0,P2.hp/(P2.ch.hp*(P2.boss?1.2:1))*100);
   dr1+=(a-dr1)*(dr1>a?.035:1);dr2+=(b-dr2)*(dr2>b?.035:1);
   el.h1.style.width=a+'%';el.d1.style.width=dr1+'%';el.h2.style.width=b+'%';el.d2.style.width=dr2+'%';
   el.h1.classList.toggle('low',a<30);el.h2.classList.toggle('low',b<30);
@@ -953,11 +970,18 @@ function drawSelect(){
 function showResult(){
   bgm(false);
   mode='result';$('ctl').hidden=true;
-  const win=P1.wins>P2.wins;
-  $('resHead').textContent=win?'승리!':'패배…';$('resHead').className='res-head '+(win?'win':'lose');
-  $('resSub').textContent=`${P1.ch.name} ${P1.wins} : ${P2.wins} ${P2.ch.name}`;
-  const s=P1.stats;
+  const win=P1.wins>P2.wins,last=arc.stage===arc.ladder.length-1,champ=win&&last;
+  for(const k in arc.tot)arc.tot[k]=k==='max'?Math.max(arc.tot.max,P1.stats.max):arc.tot[k]+P1.stats[k];
+  arc.result=champ?'champ':win?'clear':'lose';
+  $('resHead').textContent=champ?'CHAMPION!':win?`${stageLabel(arc.stage)} CLEAR!`:'패배…';
+  $('resHead').className='res-head '+(win?'win':'lose');
+  $('resSub').textContent=champ?`${P1.ch.name} · 3연승으로 복린이 체육관 챔피언 등극!`
+    :win?`${P1.ch.name} ${P1.wins} : ${P2.wins} ${P2.ch.name}  →  다음 상대 ${last?'':(arc.stage+1===arc.ladder.length-1?'FINAL BOSS ':'')}${arc.ladder[arc.stage+1].name}`
+    :`${P1.ch.name} ${P1.wins} : ${P2.wins} ${P2.ch.name}  ·  ${stageLabel(arc.stage)}에서 탈락`;
+  $('againBtn').textContent=champ?'처음부터 다시':win?'다음 상대 ▶':'이 상대에게 재도전';
+  const s=champ?arc.tot:P1.stats;
   $('stats').innerHTML=`<div><span>최대 콤보</span><b>${s.max}</b></div><div><span>카운터</span><b>${s.counters}</b></div><div><span>필살기</span><b>${s.supers}</b></div><div><span>준 데미지</span><b>${s.dealt}</b></div>`;
+  if(champ){resScene={champ:true,win:true,a:{ch:P1.ch,st:'champ',anim:0,f:1,ctrl:{},y:0,mf:0,walkT:0},b:null,conf:[]};$('resOv').hidden=false;sfx.champ();say('Champion!',.9,.6);return;}
   resScene={a:{ch:P1.ch,st:win?'win':'cry',anim:0,f:1,ctrl:{},y:0,mf:0,walkT:0},b:{ch:P2.ch,st:win?'cry':'win',anim:40,f:-1,ctrl:{},y:0,mf:0,walkT:0},win};
   $('resOv').hidden=false;
 }
@@ -966,6 +990,12 @@ function drawScene(c,ox,oy){ // 200x96 scene: P1 left, P2 right
   c.save();c.beginPath();c.rect(ox,oy,200,96);c.clip();
   c.drawImage(bg,60,66,200,96,ox,oy,200,96);
   c.fillStyle='rgba(7,6,15,.25)';c.fillRect(ox,oy,200,96);
+  if(resScene.champ){
+    const F=resScene.a;F.y=0;c.fillStyle='rgba(255,210,58,.12)';c.fillRect(ox+70,oy,60,96);
+    c.fillStyle='rgba(0,0,0,.4)';c.fillRect(ox+88,oy+91,24,3);drawFighter(c,F,ox+100,oy+92);
+    const cols=['#ffd23a','#ff4fb0','#3f7bff','#fff','#3fbf8a'];
+    for(let i=0;i<40;i++){const t=(F.anim*.6+i*37)%110,x=(i*53+Math.sin(F.anim*.05+i)*6)%200;c.fillStyle=cols[i%5];c.fillRect(ox+Math.round(x),oy+Math.round(t)-10,2,i%3?2:3);}
+    c.restore();return;}
   for(const [F,x] of [[resScene.a,70],[resScene.b,130]]){
     F.y=F.st==='win'?-Math.abs(Math.sin(F.anim*.18))*6:0;
     c.fillStyle='rgba(0,0,0,.4)';c.fillRect(ox+x-12,oy+91,24,3);
@@ -974,7 +1004,7 @@ function drawScene(c,ox,oy){ // 200x96 scene: P1 left, P2 right
   c.restore();
 }
 function drawResult(){
-  if(!resScene)return;resScene.a.anim++;resScene.b.anim++;
+  if(!resScene)return;resScene.a.anim++;if(resScene.b)resScene.b.anim++;
   const c=$('resCv').getContext('2d');c.imageSmoothingEnabled=false;c.setTransform(1,0,0,1,0,0);drawScene(c,0,0);
 }
 function makeCard(){
@@ -988,15 +1018,16 @@ function makeCard(){
   const T=(t,y,sz,col,font='"Black Han Sans","Noto Sans KR",sans-serif',sh)=>{x.font=`${sz}px ${font}`;if(sh){x.fillStyle=sh;x.fillText(t,540+6,y+6);}x.fillStyle=col;x.fillText(t,540,y);};
   T('ROOKIE BOXING BATTLE',96,30,'#ffd23a','"Press Start 2P",monospace');
   T('복린이 대전',200,130,'#f6efe3',undefined,'#ff3b55');
-  T(win?'승리!':'패배…',870,150,win?'#ffd23a':'#a39cc9',undefined,win?'#ff3b55':'#000');
-  T(`${P1.ch.name}  ${P1.wins} : ${P2.wins}  ${P2.ch.name}`,990,54,'#f6efe3','700 "Noto Sans KR",sans-serif'.replace('700 ',''));
+  const champ=resScene.champ,s2=champ?arc.tot:s;
+  T(champ?'CHAMPION!':win?'승리!':'패배…',870,champ?130:150,win?'#ffd23a':'#a39cc9',undefined,win?'#ff3b55':'#000');
+  T(champ?`${P1.ch.name} · 3연승 챔피언`:`${P1.ch.name}  ${P1.wins} : ${P2.wins}  ${P2.ch.name}`,990,54,'#f6efe3','"Noto Sans KR",sans-serif');
   x.font='700 36px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';
-  x.fillText(`최대 ${s.max}콤보 · 카운터 ${s.counters} · 필살기 ${s.supers} · 데미지 ${s.dealt}`,540,1070);
+  x.fillText(`최대 ${s2.max}콤보 · 카운터 ${s2.counters} · 필살기 ${s2.supers} · 데미지 ${s2.dealt}`,540,1070);
   x.font='900 46px "Noto Sans KR",sans-serif';x.fillStyle='#ff4fb0';
-  x.fillText(win?'나랑 붙어볼 복서 구함 👊':'누가 대신 복수 좀 👊',540,1160);
+  x.fillText(champ?'복린이 체육관 접수 완료 🏆':win?'나랑 붙어볼 복서 구함 👊':'누가 대신 복수 좀 👊',540,1160);
   x.fillStyle='#151233';x.fillRect(0,1232,1080,120);
   x.font='700 34px "Noto Sans KR",sans-serif';x.fillStyle='#f6efe3';x.fillText('@nangman.boxer',540,1272);
-  x.font='26px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';x.fillText('dy747.github.io/bokrini-battle  ·  v1.7',540,1314);
+  x.font='26px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';x.fillText('dy747.github.io/bokrini-battle  ·  v1.8',540,1314);
   return C;
 }
 let shotFile=null;
@@ -1015,7 +1046,10 @@ $('shotShare').addEventListener('click',async()=>{
 });
 function toSelect(){resScene=null;$('shotOv').hidden=true;bgm(false);mode='select';paused=false;P1=null;['resOv','pauseOv'].forEach(id=>$(id).hidden=true);$('ctl').hidden=true;$('selOv').hidden=false;clearCallout();$('pops').innerHTML='';}
 $('goBtn').addEventListener('click',()=>{ensureAudio();startMatch();});
-$('againBtn').addEventListener('click',()=>{resScene=null;$('shotOv').hidden=true;ensureAudio();startMatch();});
+$('againBtn').addEventListener('click',()=>{resScene=null;$('shotOv').hidden=true;ensureAudio();
+  if(!arc||arc.result==='champ')return startMatch();
+  if(arc.result==='clear')arc.stage++;
+  startStage();});
 $('selBtn').addEventListener('click',toSelect);
 $('quitBtn').addEventListener('click',toSelect);
 const isIOS=/iP(hone|od|ad)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
