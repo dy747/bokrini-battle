@@ -253,6 +253,19 @@ html.port #joy{bottom:calc(env(safe-area-inset-bottom,0px) + 34px)}
 #joy.on::before,#joy.on::after{opacity:0}
 #joy.on #knob{opacity:.6}
 #btns{right:max(8px,calc(env(safe-area-inset-right,0px) + 4px));bottom:calc(env(safe-area-inset-bottom,0px) + 4px)}
+
+#endOv{background:#05040a;overflow:hidden;z-index:11}
+#endOv>.card{max-width:980px;height:100%;margin:0 auto;flex-direction:row;align-items:center;justify-content:center;gap:clamp(14px,4vw,40px);text-align:left}
+html.port #endOv>.card{flex-direction:column;gap:14px;text-align:center}
+#endCv{flex:none;height:min(calc(var(--lh,1vh)*80),calc(var(--sw,100vw)*.42));width:auto;aspect-ratio:4/3;max-width:100%;image-rendering:pixelated;border:3px solid var(--gold);box-shadow:0 0 30px rgba(255,210,58,.25)}
+html.port #endCv{width:min(100%,calc(var(--lh,1vh)*70));height:auto}
+.endTxt{display:flex;flex-direction:column;gap:clamp(6px,calc(var(--lh,1vh)*2.2),14px);max-width:340px;min-width:0}
+html.port .endTxt{align-items:center}
+.endTag{font:clamp(8px,calc(var(--lh,1vh)*2.4),12px) var(--f-px);color:var(--gold);letter-spacing:.06em}
+.endName{font-family:var(--f-display);font-size:clamp(26px,calc(var(--lh,1vh)*9),42px);line-height:1;color:var(--chalk);text-shadow:3px 3px 0 var(--red)}
+.endLine{margin:0;white-space:pre-line;font-size:clamp(13px,calc(var(--lh,1vh)*3.8),18px);line-height:1.7;font-weight:700;color:var(--chalk);min-height:6.8em}
+#endBtn{align-self:flex-start;min-width:0}
+html.port #endBtn{align-self:center}
 </style>
 
 </head>
@@ -303,10 +316,22 @@ html.port #joy{bottom:calc(env(safe-area-inset-bottom,0px) + 34px)}
 
 <div class="ov" id="selOv">
   <div class="card">
-    <div class="selHead"><button class="exitBtn exitTop" type="button">완전 종료</button><div class="logo">복린이 대전<small>ROOKIE BOXING BATTLE</small></div><p class="credit"><span>v1.9</span><a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a></p></div>
+    <div class="selHead"><button class="exitBtn exitTop" type="button">완전 종료</button><div class="logo">복린이 대전<small>ROOKIE BOXING BATTLE</small></div><p class="credit"><span>v2.0</span><a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a></p></div>
     <div class="sel" id="sel"></div>
     <p class="help selhelp"><b>↓</b> 숙이면 펀치 회피 · <b>뒤로 당기기/가드</b> 막기 · 펀치 <b>이어 누르면 콤보</b> · 게이지 차면 <b>SUPER</b> · 3판 2선승</p>
     <button class="btn" id="goBtn" type="button">링 위로 올라가기</button>
+  </div>
+</div>
+
+<div class="ov" id="endOv" hidden>
+  <div class="card">
+    <canvas id="endCv" width="160" height="120" aria-label="챔피언 엔딩 장면"></canvas>
+    <div class="endTxt">
+      <div class="endTag">CHAMPION ENDING</div>
+      <div class="endName" id="endName"></div>
+      <p class="endLine" id="endLine"></p>
+      <button class="btn" id="endBtn" type="button">챔피언 기록 보기 ▶</button>
+    </div>
   </div>
 </div>
 
@@ -981,10 +1006,213 @@ function showResult(){
   $('againBtn').textContent=champ?'처음부터 다시':win?'다음 상대 ▶':'이 상대에게 재도전';
   const s=champ?arc.tot:P1.stats;
   $('stats').innerHTML=`<div><span>최대 콤보</span><b>${s.max}</b></div><div><span>카운터</span><b>${s.counters}</b></div><div><span>필살기</span><b>${s.supers}</b></div><div><span>준 데미지</span><b>${s.dealt}</b></div>`;
-  if(champ){resScene={champ:true,win:true,a:{ch:P1.ch,st:'champ',anim:0,f:1,ctrl:{},y:0,mf:0,walkT:0},b:null,conf:[]};$('resOv').hidden=false;sfx.champ();say('Champion!',.9,.6);return;}
+  const rc=$('resCv');
+  if(champ){resScene={champ:true,win:true,a:{ch:P1.ch,anim:0},b:null};rc.width=160;rc.height=120;rc.style.aspectRatio='4/3';
+    const E=ENDTXT[arc.ch.id];$('endName').textContent=P1.ch.name;endTyped={txt:E.line,n:0};$('endLine').textContent='';
+    $('endBtn').style.visibility='hidden';$('endOv').hidden=false;sfx.champ();say('Champion!',.9,.6);return;}
+  rc.width=200;rc.height=96;rc.style.aspectRatio='';
   resScene={a:{ch:P1.ch,st:win?'win':'cry',anim:0,f:1,ctrl:{},y:0,mf:0,walkT:0},b:{ch:P2.ch,st:win?'cry':'win',anim:40,f:-1,ctrl:{},y:0,mf:0,walkT:0},win};
   $('resOv').hidden=false;
 }
+/* ================= champion endings: 160x120 crisp pixel art ================= */
+const EW=160,EH=120;
+function mkC(w=EW,h=EH){const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.imageSmoothingEnabled=false;return [c,x];}
+const [eTmp,eT]=mkC();
+const rgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
+function crisp(L,col,draw,how='fill',lw=1){
+  eT.setTransform(1,0,0,1,0,0);eT.clearRect(0,0,EW,EH);
+  eT.fillStyle=col;eT.strokeStyle=col;eT.lineWidth=lw;eT.lineCap='round';eT.lineJoin='round';eT.beginPath();draw(eT);
+  if(how==='fill')eT.fill();else if(how==='stroke')eT.stroke();
+  const d=eT.getImageData(0,0,EW,EH),a=d.data,[r,g,b]=rgb(col);
+  for(let i=0;i<a.length;i+=4){if(a[i+3]>=110){a[i]=r;a[i+1]=g;a[i+2]=b;a[i+3]=255;}else a[i+3]=0;}
+  eT.putImageData(d,0,0);L.drawImage(eTmp,0,0);}
+function crispImg(L,img,cx,cy,rot){eT.setTransform(1,0,0,1,0,0);eT.clearRect(0,0,EW,EH);eT.imageSmoothingEnabled=false;
+  eT.translate(cx,cy);eT.rotate(rot);eT.drawImage(img,-img.width/2,-img.height/2);eT.setTransform(1,0,0,1,0,0);
+  const d=eT.getImageData(0,0,EW,EH),a=d.data;for(let i=3;i<a.length;i+=4)a[i]=a[i]>=128?255:0;eT.putImageData(d,0,0);L.drawImage(eTmp,0,0);}
+const Ef=(L,c,x,y,rx,ry,r=0)=>crisp(L,c,t=>t.ellipse(x,y,rx,ry,r,0,7));
+const Pf=(L,c,...p)=>crisp(L,c,t=>{t.moveTo(p[0],p[1]);for(let i=2;i<p.length;i+=2)t.lineTo(p[i],p[i+1]);t.closePath();});
+const Ln=(L,c,w,...p)=>crisp(L,c,t=>{t.moveTo(p[0],p[1]);for(let i=2;i<p.length;i+=2)t.lineTo(p[i],p[i+1]);},'stroke',w);
+const Qd=(L,c,w,x0,y0,cx,cy,x1,y1)=>crisp(L,c,t=>{t.moveTo(x0,y0);t.quadraticCurveTo(cx,cy,x1,y1);},'stroke',w);
+const Tx=(L,c,s,font,x,y)=>crisp(L,c,t=>{t.font=font;t.textAlign='center';t.textBaseline='middle';t.fillText(s,x,y);},'paint');
+const pf=(L,c,x,y,w=1,h=1)=>{L.fillStyle=c;L.fillRect(x,y,w,h);};
+const atop=(L,fn)=>{L.save();L.globalCompositeOperation='source-atop';fn();L.restore();};
+function outline(c,col){const x=c.getContext('2d'),W=c.width,H=c.height,d=x.getImageData(0,0,W,H),a=d.data,o=new Uint8ClampedArray(a),[r,g,b]=rgb(col);
+  const on=(X,Y)=>X>=0&&Y>=0&&X<W&&Y<H&&a[(Y*W+X)*4+3]>0;
+  for(let y=0;y<H;y++)for(let X=0;X<W;X++){const i=(y*W+X)*4;if(a[i+3])continue;if(on(X+1,y)||on(X-1,y)||on(X,y+1)||on(X,y-1)){o[i]=r;o[i+1]=g;o[i+2]=b;o[i+3]=255;}}
+  d.data.set(o);x.putImageData(d,0,0);}
+function part(fn,ol='#120d1c'){const [c,x]=mkC();fn(x);if(ol)outline(c,ol);return c;}
+function compose(...ls){const [c,x]=mkC();ls.forEach(l=>x.drawImage(l,0,0));return c;}
+const qpt=(x0,y0,cx,cy,x1,y1,t)=>[(1-t)*(1-t)*x0+2*(1-t)*t*cx+t*t*x1,(1-t)*(1-t)*y0+2*(1-t)*t*cy+t*t*y1];
+function bands(b,cols,h){cols.forEach((c,i)=>{pf(b,c,0,i*h,EW,h);if(i)for(let x=i%2;x<EW;x+=2)pf(b,c,x,i*h-1);});}
+let _tro=null;
+function trophy(){if(_tro)return _tro;const [c,x]=mkC(24,30);const G='#ffd23a',S='#c8930a',D='#8a5a00',H='#fff3b0';
+  pf(x,G,0,3,3,1);pf(x,G,0,3,1,7);pf(x,S,0,9,6,1);pf(x,G,21,3,3,1);pf(x,S,23,3,1,7);pf(x,S,18,9,6,1);
+  for(let y=0;y<=13;y++){const hw=Math.max(2,Math.round(10-y*.5)),x0=12-hw,w=hw*2,sw=Math.max(1,Math.round(hw*.45));
+    pf(x,G,x0,y,w,1);pf(x,S,x0+w-sw,y,sw,1);pf(x,D,x0+w-1,y,1,1);if(y>=2&&y<=9)pf(x,H,x0+1,y,2,1);}
+  pf(x,H,2,0,20,1);pf(x,S,2,1,20,1);pf(x,'#ff3b55',11,4,2,4);pf(x,'#ff3b55',10,5,4,2);
+  pf(x,G,10,14,4,3);pf(x,S,12,14,2,3);pf(x,G,8,16,8,2);pf(x,S,13,16,3,2);pf(x,G,6,18,12,2);pf(x,S,14,18,4,2);pf(x,H,7,18,3,1);
+  pf(x,'#6a3c1a',4,20,16,7);pf(x,'#8a5428',4,20,16,1);pf(x,'#45250e',4,26,16,1);pf(x,'#45250e',18,20,2,7);
+  pf(x,G,9,22,6,3);pf(x,S,13,22,2,3);pf(x,'#2e1a0a',3,27,18,2);return _tro=c;}
+function splitTrophy(){const t=trophy(),[a,ax]=mkC(24,30),[b,bx]=mkC(24,30);ax.drawImage(t,0,0);bx.drawImage(t,0,0);
+  const A=ax.getImageData(0,0,24,30),B=bx.getImageData(0,0,24,30);
+  for(let y=0;y<30;y++)for(let x=0;x<24;x++){const cut=10+[0,2,1,3,1,0,2,3][x%8],i=(y*24+x)*4;if(y<cut)B.data[i+3]=0;else A.data[i+3]=0;}
+  ax.putImageData(A,0,0);bx.putImageData(B,0,0);return [a,b];}
+function torso(L,m,s){Pf(L,m,22,120,28,98,44,86,64,80,96,80,116,86,132,98,138,120);
+  atop(L,()=>{Pf(L,s,100,80,116,86,132,98,138,120,106,120,98,96);Pf(L,s,22,120,28,100,36,108,34,120);});}
+
+const BUILD={
+nangman(){
+  const [bg,b]=mkC();
+  bands(b,['#2a1b4a','#3a1f56','#58275f','#7f2f66','#a83d68','#d0565f','#ec7d55','#f6a65a','#ffc777'],9);
+  Ef(b,'#ffd88a',118,72,16,16);Ef(b,'#fff1c4',118,72,11,11);
+  Pf(b,'#4a2a5e',0,76,16,62,30,70,50,56,72,72,94,60,116,74,138,62,160,72,160,84,0,84);
+  Pf(b,'#2c1b42',0,84,0,74,24,68,44,78,64,68,88,80,112,70,134,78,160,70,160,86,0,86);
+  pf(b,'#1c1430',0,86,EW,34);Pf(b,'#352a4a',126,120,160,120,147,86,143,86);
+  [[145,92,1,2],[146,99,1,3],[148,108,2,4]].forEach(r=>pf(b,'#ffd27a',...r));
+  const S='#e2a47a',D='#c4835c',J='#1d1e26',JS='#121218';
+  const neck=part(L=>{Pf(L,'#d99a72',72,62,88,62,90,90,70,90);atop(L,()=>pf(L,'#b97a56',68,62,24,8));});
+  const body=part(L=>{torso(L,J,JS);
+    Pf(L,'#1f2747',69,82,91,82,86,120,74,120);atop(L,()=>Pf(L,'#161c38',80,82,91,82,86,120,81,120));
+    Pf(L,'#2c3766',67,80,80,86,73,95);Pf(L,'#2c3766',93,80,80,86,87,95);pf(L,'#4a5788',79,93,2,2);pf(L,'#4a5788',79,101,2,2);
+    Ln(L,'#2d2e3a',1,40,104,45,120);Ln(L,'#2d2e3a',1,120,104,115,120);Ln(L,'#7d808c',1,67,98,71,120);Ln(L,'#7d808c',1,93,98,89,120);});
+  const collar=part(L=>{Pf(L,'#2a2a31',54,86,66,79,74,96,72,120,64,120,58,100);Pf(L,'#2a2a31',106,86,94,79,86,96,88,120,96,120,102,100);
+    atop(L,()=>{for(let i=0;i<90;i++)pf(L,i%3?'#3a3a44':'#202027',54+(i*17)%52,79+(i*11)%41);});});
+  const head=part(L=>{Ef(L,S,64,52,3,5);Ef(L,S,96,52,3,5);Ef(L,S,80,49,15,18);Pf(L,S,65,52,70,65,80,70,90,65,95,52);
+    atop(L,()=>{Ef(L,D,93,54,6,15);pf(L,D,64,50,2,4);pf(L,D,95,50,2,4);for(let i=0;i<16;i++)pf(L,'#b07a5a',72+(i*7)%17,60+(i%3));});
+    pf(L,D,81,51,1,7);pf(L,'#a8664a',78,58,5,1);pf(L,'#f3c3a0',79,52,1,5);
+    Qd(L,'#8a4636',1,74,64,79,65,86,62);pf(L,'#c27a62',77,66,6,1);pf(L,'#f0bd98',69,57,3,1);});
+  const hair=part(L=>{const H='#17171d';Ef(L,H,80,32,18,10);Pf(L,H,62,34,63,52,67,52,68,40);Pf(L,H,98,34,97,50,93,50,92,40);
+    Ef(L,H,79,27,17,8);Pf(L,H,90,22,101,25,99,32,94,28);Pf(L,H,62,30,66,22,72,26);Ln(L,H,2,86,36,90,42,92,47);Ln(L,H,2,80,37,82,43);
+    atop(L,()=>{Qd(L,'#3a3a4a',1,64,32,74,20,94,24);Qd(L,'#3a3a4a',1,68,36,80,26,96,30);Qd(L,'#5a5a70',1,68,26,76,21,86,21);Qd(L,'#2a2a36',1,72,40,84,32,98,34);});});
+  const glasses=part(L=>{Ef(L,'#8494a8',72,51,7,5.5,.12);Ef(L,'#8494a8',88,51,7,5.5,-.12);
+    atop(L,()=>{pf(L,'#dde5ee',60,44,40,4);pf(L,'#b0bccb',60,48,40,2);pf(L,'#5f6b7c',60,53,40,3);pf(L,'#3f4a59',60,56,40,3);
+      pf(L,'#ffb27a',66,50,4,1);pf(L,'#ffb27a',82,50,4,1);Ln(L,'#ffffff',1,67,49,70,46);Ln(L,'#ffffff',1,83,49,86,46);});
+    Ln(L,'#d9dde3',1,65,45,95,45);Ln(L,'#d9dde3',1,64,47,62,50);Ln(L,'#d9dde3',1,96,47,98,50);},'#262a33');
+  const tro=part(L=>L.drawImage(trophy(),111,46));
+  const arm=part(L=>{Pf(L,J,104,100,114,90,121,82,130,84,126,100,114,110);atop(L,()=>Pf(L,JS,118,96,127,86,130,84,126,100,114,110));
+    Ef(L,S,123,78,5,4);pf(L,D,119,80,8,1);pf(L,D,121,76,1,3);});
+  return {bg,fg:compose(neck,body,collar,head,hair,glasses,tro,arm),
+    back(x,t){const fl=Math.floor(t/10)%2;[[20,28],[30,24],[40,30]].forEach(([bx,by],i)=>{const X=Math.round((bx+t*.08+i*3)%170)-5,Y=by+(i%2);
+      pf(x,'#2a1b4a',X,Y);pf(x,'#2a1b4a',X-1,Y-fl);pf(x,'#2a1b4a',X+1,Y-fl);pf(x,'#2a1b4a',X-2,Y-fl*2);pf(x,'#2a1b4a',X+2,Y-fl*2);});}};
+},
+gobong(){
+  const [bg,b]=mkC();
+  bands(b,['#070b1f','#0a1029','#0e1534','#131b40','#18224c','#1f2a58','#273566'],12);
+  for(let i=0;i<40;i++)pf(b,i%5?'#9fb0e0':'#ffffff',(i*37+11)%EW,(i*23+5)%70);
+  Ef(b,'#f6efcf',132,22,8,8);Ef(b,'#0a1029',136,19,7,7);
+  Pf(b,'#121a3c',0,86,20,74,46,80,70,70,100,82,126,72,160,80,160,92,0,92);pf(b,'#0b1029',0,92,EW,28);
+  [[110,80],[120,83],[148,79]].forEach(([hx,hy])=>{Pf(b,'#0b1029',hx,hy,hx+4,hy-4,hx+8,hy,hx+8,hy+6,hx,hy+6);pf(b,'#ffd27a',hx+3,hy+2,2,2);});
+  const S='#efbe96',D='#d39a72',N='#1e2645',NS='#151b33';
+  const neck=part(L=>{Pf(L,S,72,62,88,62,90,90,70,90);atop(L,()=>pf(L,D,68,62,24,10));});
+  const body=part(L=>{torso(L,N,NS);Pf(L,'#2a3463',66,80,80,88,72,98);Pf(L,'#2a3463',94,80,80,88,88,98);
+    pf(L,NS,79,88,2,22);pf(L,'#3d4a80',79,94,2,2);pf(L,'#3d4a80',79,102,2,2);Ln(L,'#283157',1,42,104,47,120);Ln(L,'#283157',1,118,104,113,120);});
+  const bundle=part(L=>{Ln(L,'#7a4a24',2,104,104,138,62);Ef(L,'#d8262f',140,68,9,7);
+    atop(L,()=>{[[136,64],[142,70],[146,65],[138,72]].forEach(([x0,y0])=>pf(L,'#ffffff',x0,y0,2,2));Ef(L,'#a81822',144,72,5,3);});
+    Pf(L,'#d8262f',133,61,136,54,140,60);Pf(L,'#d8262f',147,61,144,54,140,60);});
+  const head=part(L=>{Ef(L,S,62,52,3,5);Ef(L,S,98,52,3,5);Ef(L,S,80,47,18,20);Pf(L,S,63,52,68,66,80,72,92,66,97,52);
+    atop(L,()=>{Ef(L,D,95,52,7,17);Ef(L,'#fde3c8',72,33,6,4);for(let i=0;i<10;i++){pf(L,'#8a6040',65+(i%3),58+i);pf(L,'#8a6040',94-(i%3),58+i);}});
+    Qd(L,'#3a2418',1,69,51,73,46,77,51);Qd(L,'#3a2418',1,83,51,87,46,91,51);
+    Ef(L,'#f2a08a',68,56,3,1.5);Ef(L,'#f2a08a',92,56,3,1.5);pf(L,D,81,51,1,6);pf(L,'#b87a56',78,57,5,1);
+    Pf(L,'#5a1a1a',71,61,89,61,85,67,75,67);pf(L,'#ffffff',72,61,16,2);pf(L,'#d84a5a',77,65,6,2);
+    Pf(L,'#5a3a22',70,60,80,57,90,60,87,61,80,59,73,61);
+    Pf(L,'#5a3a22',73,68,87,68,85,76,80,79,75,76);atop(L,()=>{for(let i=0;i<14;i++)pf(L,'#7a5434',74+(i*5)%12,69+(i*3)%9);});});
+  const braids=part(L=>{for(const s of [[70,30,60,40,59,76],[79,27,80,40,80,57],[88,28,95,40,95,62],[94,31,104,42,102,76]]){
+      const pts=[];for(let i=0;i<=24;i++)pts.push(qpt(...s,i/24));
+      Ln(L,'#4a2614',4,...pts.slice(0,21).flat());Ln(L,'#e3bd78',3,...pts.slice(20).flat());
+      pts.slice(0,20).forEach(([x0,y0],i)=>pf(L,i%2?'#c98a52':'#e3b07a',Math.round(x0)+(i%3)-1,Math.round(y0)));
+      pts.slice(21).forEach(([x0,y0])=>pf(L,'#b88a40',Math.round(x0),Math.round(y0)));}},'#2a140a');
+  const tro=part(L=>L.drawImage(trophy(),15,40));
+  const arm=part(L=>{Pf(L,N,30,100,42,90,34,74,24,76,24,92);atop(L,()=>Pf(L,NS,34,100,42,90,38,80,32,96));Ef(L,S,27,72,5,4);pf(L,D,23,74,8,1);});
+  return {bg,fg:compose(neck,body,bundle,head,braids,tro,arm),
+    back(x,t){for(let i=0;i<8;i++){if(((t>>3)+i*5)%7===0){const X=(i*41+13)%EW,Y=(i*29+7)%60;pf(x,'#ffffff',X-1,Y,3,1);pf(x,'#ffffff',X,Y-1,1,3);}}
+      const s=t%240;if(s<24){const X=20+s*3,Y=10+s;pf(x,'#ffffff',X,Y,2,1);pf(x,'#9fb0e0',X-3,Y-1,3,1);pf(x,'#5a6aa0',X-6,Y-2,3,1);}}};
+},
+candy(){
+  const [bg,b]=mkC();pf(b,'#14040a',0,0,EW,EH);
+  for(let i=0;i<18;i+=2){const a0=i/18*Math.PI*2,a1=(i+1)/18*Math.PI*2;Pf(b,'#2c0812',80,46,80+Math.cos(a0)*160,46+Math.sin(a0)*160,80+Math.cos(a1)*160,46+Math.sin(a1)*160);}
+  Ef(b,'#2a0912',80,46,46,46);Ef(b,'#3a0c18',80,46,36,36);Ef(b,'#4a1020',80,46,26,26);
+  const SK='#ecb995',SD='#c48d6b',HB='#e6d6b4',HS='#bba67e',HD='#8f7b58',HL='#fff4da',T='#17151c',TS='#0e0d12';
+  const hairBack=part(L=>{[[80,34,23,15],[60,48,10,13],[57,62,9,10],[61,75,8,7],[100,48,10,13],[103,62,9,10],[99,75,8,7]].forEach(e=>Ef(L,HB,...e));
+    atop(L,()=>{Qd(L,HS,2,52,52,58,60,52,68);Qd(L,HS,2,108,52,102,60,108,68);Qd(L,HD,1,56,74,62,80,68,76);Qd(L,HD,1,104,74,98,80,92,76);
+      Qd(L,HL,1,64,24,74,20,86,22);Qd(L,HL,1,52,46,54,40,60,36);Qd(L,HL,1,106,46,106,40,100,36);Ef(L,HS,104,66,3,8);});});
+  const neck=part(L=>{Pf(L,SK,72,60,88,60,91,90,69,90);atop(L,()=>{pf(L,SD,68,60,24,9);pf(L,'#d9a27e',68,69,24,2);});});
+  const body=part(L=>{torso(L,T,TS);Qd(L,'#2a2733',2,69,84,80,92,91,84);Ln(L,'#24212b',1,44,100,52,118);Ln(L,'#24212b',1,116,100,108,118);
+    Tx(L,'#d4d4dc','CAN.D','bold 11px "Black Han Sans","Noto Sans KR",sans-serif',80,106);});
+  const head=part(L=>{Pf(L,SK,67,48,69,62,80,69,91,62,93,48);Ef(L,SK,80,48,13,16);atop(L,()=>Ef(L,SD,91,53,5,13));
+    Qd(L,'#8a6a50',1,69,45,73,43,78,45);Qd(L,'#8a6a50',1,83,45,87,43,92,45);
+    for(const ex of [71,84]){pf(L,'#c48d6b',ex,47,6,1);pf(L,'#f4ece6',ex,49,6,2);pf(L,'#3a2418',ex+2,49,3,2);pf(L,'#1a1010',ex-1,48,8,1);pf(L,'#1a1010',ex+6,47,2,1);}
+    pf(L,SD,80,50,1,6);pf(L,'#6a3a30',77,57,2,1);pf(L,'#6a3a30',82,57,2,1);pf(L,'#f6cfb0',79,52,1,3);
+    Pf(L,'#c8283a',74,62,80,60.5,86,62,83,63.5,77,63.5);pf(L,'#5a1a22',76,63,8,1);Ef(L,'#d8364a',80,65,5,1.8);pf(L,'#ff8090',78,64,2,1);
+    pf(L,SD,70,58,2,1);pf(L,SD,88,58,2,1);});
+  const hairFront=part(L=>{Pf(L,HB,62,44,64,32,72,27,82,26,94,29,99,38,100,46,95,38,88,34,78,35,70,39,66,46);Ef(L,HB,64,58,4,10);Ef(L,HB,96,58,4,10);
+    atop(L,()=>{Qd(L,HS,1,66,40,74,32,86,30);Qd(L,HL,1,70,31,78,28,88,29);Qd(L,HS,1,94,34,98,40,99,46);pf(L,HS,62,60,2,6);pf(L,HS,96,60,2,6);});});
+  const flowers=part(L=>{[[58,38],[55,46],[59,53],[54,56]].forEach(([fx,fy])=>{for(let k=0;k<5;k++){const a=k*1.2566;Ef(L,'#ffffff',fx+Math.cos(a)*2,fy+Math.sin(a)*2,1.6,1.6);}pf(L,'#ffd23a',fx,fy);});},'#6a5a40');
+  const [tp,bp]=splitTrophy();
+  const pieces=part(L=>{crispImg(L,tp,29,63,-.35);crispImg(L,bp,131,49,.3);});
+  const arms=part(L=>{Pf(L,T,28,104,36,90,46,92,40,106);Pf(L,SK,32,96,26,70,32,68,40,94);atop(L,()=>Ln(L,SD,1,35,94,30,72));Ef(L,SK,29,66,5,4);pf(L,SD,25,67,8,1);
+    Pf(L,T,132,104,124,90,114,92,120,106);Pf(L,SK,128,96,134,70,128,68,120,94);atop(L,()=>Ln(L,SD,1,126,94,132,72));Ef(L,SK,131,66,5,4);pf(L,SD,127,67,8,1);});
+  return {bg,fg:compose(hairBack,neck,body,head,hairFront,flowers,pieces,arms),
+    back(x,t){for(let i=0;i<10;i++){const X=Math.round((i*29+t*.3*(1+(i%3)*.3))%EW),Y=Math.round((i*17+t*.5)%(EH+10))-5;pf(x,'#8a1420',X,Y,2,1);}},
+    front(x,t){for(let i=0;i<12;i++){const sp=.5+(i%4)*.18,X=Math.round((i*37+Math.sin(t*.03+i)*8+t*.2)%EW),Y=Math.round((i*23+t*sp)%(EH+10))-5,f=((t>>3)+i)&1;
+        pf(x,'#d81f2a',X,Y,f?3:2,f?2:3);pf(x,'#ff5a5a',X,Y);}
+      const g=Math.floor(t/6)%4,u=(t>>4)%3;[[44,46],[50,40],[118,34],[112,28],[46,54]].forEach(([sx,sy],i)=>{if((g+i)%4<2){pf(x,'#ffd23a',sx,sy-u,2,1);pf(x,'#fff3b0',sx,sy-u);}});}};
+},
+pigeon(){
+  const [bg,b]=mkC();pf(b,'#e3e6ed',0,0,EW,EH);pf(b,'#f4f5f8',0,0,EW,9);pf(b,'#c3c8d3',0,9,EW,1);
+  for(let x=10;x<EW;x+=30){Ef(b,'#ffffff',x,13,3,2);pf(b,'#9aa0ad',x-1,9,2,2);}
+  for(let x=0;x<EW;x+=22)pf(b,'#d4d8e1',x,10,1,80);
+  pf(b,'#2a2a31',0,90,EW,30);pf(b,'#3a3a42',0,90,EW,1);for(let i=0;i<60;i++)pf(b,i%4?'#44444d':'#7a6a4a',(i*37)%EW,92+(i*13)%28);
+  pf(b,'#8a8d96',16,10,1,14);Pf(b,'#1c1c22',10,26,22,26,23,70,21,74,11,74,9,70);pf(b,'#c0202e',9,50,14,5);pf(b,'#3a3a44',11,24,10,3);
+  pf(b,'#8a8d96',144,10,1,12);Pf(b,'#f0f0f3',138,24,150,24,151,66,149,70,139,70,137,66);pf(b,'#cfd1d8',146,24,4,46);pf(b,'#d81f2a',137,44,14,3);
+  const SK='#d9a07c',SKD='#b47e5c',W='#f2f2f4',T='#18181d';
+  const body=part(L=>{torso(L,T,'#0f0f13');Ln(L,'#26262d',1,44,104,50,120);Ln(L,'#26262d',1,116,104,110,120);});
+  const head=part(L=>{Pf(L,'#3d4a5e',60,92,62,62,68,48,92,48,98,62,100,92);Ef(L,'#56677f',80,40,17,19);
+    atop(L,()=>{[['#3a5560',58],['#2f7f7a',64],['#3a8f80',72],['#4a4a7a',82]].forEach(([c,y])=>pf(L,c,0,y,EW,10));
+      for(let i=0;i<80;i++)pf(L,['#5fd0a0','#2a6e70','#7a6aaa','#46b090'][i%4],60+(i*13)%42,58+(i*7)%34);
+      Ef(L,'#7b8ca5',72,30,7,5);Ef(L,'#3e4b60',93,46,6,12);for(let i=0;i<30;i++)pf(L,'#6c7e98',64+(i*11)%32,24+(i*7)%30);});
+    for(const [ex,ey] of [[66,39],[94,39]]){Ef(L,'#c8662e',ex,ey,3,3.5);pf(L,'#1a1010',ex-1,ey-1,2,2);pf(L,'#ffffff',ex-1,ey-2);}
+    Ef(L,'#e8e4ea',80,45,3.5,2);pf(L,'#b4b0ba',78,45);pf(L,'#b4b0ba',81,44);
+    Pf(L,'#4c515c',77,46,83,46,81,53,80,55,79,53);pf(L,'#2a2d33',79,52,2,3);pf(L,'#6a707c',78,47,1,3);},'#14141c');
+  const tro=part(L=>{L.save();L.translate(128,100);L.scale(1,-1);L.drawImage(trophy(),0,0);L.restore();});
+  const bread=part(L=>{Ef(L,'#c98a46',34,60,7,5);Ef(L,'#c98a46',46,60,7,5);Pf(L,'#c98a46',28,60,53,60,52,74,29,74);
+    atop(L,()=>{Pf(L,'#f2d79a',31,62,50,62,49,72,32,72);Ef(L,'#f2d79a',35,61,4,2.5);Ef(L,'#f2d79a',45,61,4,2.5);});
+    L.save();L.globalCompositeOperation='destination-out';Ef(L,'#000000',53,60,4,3.5);Ef(L,'#000000',53,66,3,3);L.restore();
+    for(let i=0;i<8;i++)pf(L,'#e0b878',33+(i*5)%15,64+(i*3)%7);});
+  const arms=part(L=>{Pf(L,T,110,98,120,88,134,94,132,106);Pf(L,SK,128,106,136,106,142,78,135,78);atop(L,()=>pf(L,SKD,139,78,4,28));
+    Pf(L,W,131,86,141,86,139,96,129,96);pf(L,'#3fd1b5',129,94,11,1);Ef(L,W,139,74,5,4);pf(L,'#cfcfd6',135,76,8,1);
+    Pf(L,T,52,98,42,88,30,92,32,104);Pf(L,SK,31,104,41,104,42,82,35,82);atop(L,()=>pf(L,SKD,39,82,3,22));
+    Pf(L,W,31,88,41,88,41,96,31,96);pf(L,'#3fd1b5',31,94,10,1);});
+  const hand=part(L=>{Ef(L,W,38,77,5,4);pf(L,'#cfcfd6',34,79,8,1);});
+  return {bg,fg:compose(body,head,tro,bread,arms,hand),
+    front(x,t){for(let i=0;i<6;i++){const ph=(t*1.2+i*13)%26,X=135+((i*5)%9)+Math.round(Math.sin(i+t*.1)),Y=101+Math.floor(ph);if(Y<118)pf(x,i%2?'#e8c070':'#d6a24a',X,Y,i%3?1:2,1);}
+      [[132,117],[136,118],[141,117],[145,118],[149,117],[139,116]].forEach(([cx,cy])=>pf(x,'#e8c070',cx,cy,2,1));}};
+}};
+const endCache={};
+function drawEnding(c,id,t){const e=endCache[id]||(endCache[id]=BUILD[id]()),x=c.getContext('2d');x.imageSmoothingEnabled=false;x.setTransform(1,0,0,1,0,0);
+  x.drawImage(e.bg,0,0);e.back&&e.back(x,t);x.drawImage(e.fg,0,Math.floor(t/40)%2);e.front&&e.front(x,t);}
+const ENDTXT={
+  nangman:{line:'더 강한 상대를 찾기 위해,\n낭만복서는 다시\n수련의 길로 떠난다.',key:'"다시 수련의 길로 떠난다"'},
+  gobong:{line:'태어난 곳을 모르는 봉식군.\n챔피언이 된 그는\n자신의 고향을 찾아 떠난다.',key:'"자신의 고향을 찾아 떠난다"'},
+  candy:{line:'"이렇게 허약한 상대들밖에 없는가?"\n\n캔.D는 우승 트로피를\n두 동강 내버렸다.',key:'"이렇게 허약한 상대들밖에 없는가?"'},
+  pigeon:{line:'트로피엔 관심 없었다.\n비둘기씨는\n그저 배가 고팠다.\n\n구구.',key:'"그저 배가 고팠다. 구구."'}};
+let endTyped=null;
+function makeChampCard(){
+  const C=document.createElement('canvas');C.width=1080;C.height=1350;const x=C.getContext('2d');x.imageSmoothingEnabled=false;
+  x.fillStyle='#07060f';x.fillRect(0,0,1080,1350);
+  const [ec]=mkC();drawEnding(ec,arc.ch.id,resScene.a.anim);
+  x.fillStyle='#ffd23a';x.fillRect(54,234,972,732);x.drawImage(ec,60,240,960,720);
+  x.textAlign='center';x.textBaseline='middle';
+  const T=(t,y,font,col,sh)=>{x.font=font;if(sh){x.fillStyle=sh;x.fillText(t,546,y+6);}x.fillStyle=col;x.fillText(t,540,y);};
+  T('ROOKIE BOXING BATTLE',70,'30px "Press Start 2P",monospace','#ffd23a');
+  T('복린이 대전',160,'120px "Black Han Sans","Noto Sans KR",sans-serif','#f6efe3','#ff3b55');
+  T('CHAMPION!',1050,'120px "Black Han Sans","Noto Sans KR",sans-serif','#ffd23a','#ff3b55');
+  T(`${P1.ch.name} · 3연승 챔피언`,1135,'700 46px "Noto Sans KR",sans-serif','#f6efe3');
+  T(ENDTXT[arc.ch.id].key,1195,'900 40px "Noto Sans KR",sans-serif','#ff4fb0');
+  x.fillStyle='#151233';x.fillRect(0,1240,1080,110);
+  T('@nangman.boxer',1278,'700 34px "Noto Sans KR",sans-serif','#f6efe3');
+  T('dy747.github.io/bokrini-battle  ·  v2.0',1318,'26px "Noto Sans KR",sans-serif','#a39cc9');
+  return C;}
+
 let resScene=null;
 function drawScene(c,ox,oy){ // 200x96 scene: P1 left, P2 right
   c.save();c.beginPath();c.rect(ox,oy,200,96);c.clip();
@@ -1005,6 +1233,11 @@ function drawScene(c,ox,oy){ // 200x96 scene: P1 left, P2 right
 }
 function drawResult(){
   if(!resScene)return;resScene.a.anim++;if(resScene.b)resScene.b.anim++;
+  if(resScene.champ){const id=arc.ch.id,t=resScene.a.anim;
+    if(!$('endOv').hidden){drawEnding($('endCv'),id,t);const E=endTyped;
+      if(E&&E.n<E.txt.length&&t%3===0){E.n++;$('endLine').textContent=E.txt.slice(0,E.n);if(!/\s/.test(E.txt[E.n-1]))osc(1400,null,.02,'square',.04);if(E.n>=E.txt.length)$('endBtn').style.visibility='visible';}}
+    else drawEnding($('resCv'),id,t);
+    return;}
   const c=$('resCv').getContext('2d');c.imageSmoothingEnabled=false;c.setTransform(1,0,0,1,0,0);drawScene(c,0,0);
 }
 function makeCard(){
@@ -1027,26 +1260,28 @@ function makeCard(){
   x.fillText(champ?'복린이 체육관 접수 완료 🏆':win?'나랑 붙어볼 복서 구함 👊':'누가 대신 복수 좀 👊',540,1160);
   x.fillStyle='#151233';x.fillRect(0,1232,1080,120);
   x.font='700 34px "Noto Sans KR",sans-serif';x.fillStyle='#f6efe3';x.fillText('@nangman.boxer',540,1272);
-  x.font='26px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';x.fillText('dy747.github.io/bokrini-battle  ·  v1.9',540,1314);
+  x.font='26px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';x.fillText('dy747.github.io/bokrini-battle  ·  v2.0',540,1314);
   return C;
 }
 let shotFile=null;
 $('saveBtn').addEventListener('click',()=>{
   if(!resScene)return;
-  const C=makeCard();const url=C.toDataURL('image/png');$('shotImg').src=url;shotFile=null;
+  const C=resScene.champ?makeChampCard():makeCard();const url=C.toDataURL('image/png');$('shotImg').src=url;shotFile=null;
   try{C.toBlob(b=>{if(b)shotFile=new File([b],'bokrini-battle.png',{type:'image/png'});},'image/png');}catch(e){}
   $('shotHint').innerHTML=isIOS?"이미지를 <b>길게 눌러</b> '사진에 저장'을 누르세요":"아래 <b>저장 / 공유하기</b>를 누르거나 이미지를 길게 눌러 저장하세요";
   $('shotOv').hidden=false;
 });
+$('endBtn').addEventListener('click',()=>{$('endOv').hidden=true;$('resOv').hidden=false;});
+$('endOv').addEventListener('pointerdown',e=>{if(e.target.id==='endBtn')return;const E=endTyped;if(E&&E.n<E.txt.length){E.n=E.txt.length;$('endLine').textContent=E.txt;$('endBtn').style.visibility='visible';}});
 $('shotClose').addEventListener('click',()=>{$('shotOv').hidden=true;});
 $('shotShare').addEventListener('click',async()=>{
   try{if(shotFile&&navigator.canShare&&navigator.canShare({files:[shotFile]})){await navigator.share({files:[shotFile],title:'복린이 대전'});return;}}catch(e){if(e&&e.name==='AbortError')return;}
   try{const a=document.createElement('a');a.href=$('shotImg').src;a.download='bokrini-battle.png';document.body.appendChild(a);a.click();a.remove();}catch(e){}
   toast(isIOS?"이미지를 길게 눌러 '사진에 저장'을 누르세요":'저장이 안 되면 이미지를 길게 눌러 저장하세요');
 });
-function toSelect(){resScene=null;$('shotOv').hidden=true;bgm(false);mode='select';paused=false;P1=null;['resOv','pauseOv'].forEach(id=>$(id).hidden=true);$('ctl').hidden=true;$('selOv').hidden=false;clearCallout();$('pops').innerHTML='';}
+function toSelect(){resScene=null;$('endOv').hidden=true;$('shotOv').hidden=true;bgm(false);mode='select';paused=false;P1=null;['resOv','pauseOv'].forEach(id=>$(id).hidden=true);$('ctl').hidden=true;$('selOv').hidden=false;clearCallout();$('pops').innerHTML='';}
 $('goBtn').addEventListener('click',()=>{ensureAudio();startMatch();});
-$('againBtn').addEventListener('click',()=>{resScene=null;$('shotOv').hidden=true;ensureAudio();
+$('againBtn').addEventListener('click',()=>{resScene=null;$('endOv').hidden=true;$('shotOv').hidden=true;ensureAudio();
   if(!arc||arc.result==='champ')return startMatch();
   if(arc.result==='clear')arc.stage++;
   startStage();});
