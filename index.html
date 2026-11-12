@@ -302,7 +302,7 @@ html.port #joy{bottom:calc(env(safe-area-inset-bottom,0px) + 34px)}
 
 <div class="ov" id="selOv">
   <div class="card">
-    <div class="selHead"><button class="exitBtn exitTop" type="button">완전 종료</button><div class="logo">복린이 대전<small>ROOKIE BOXING BATTLE</small></div><p class="credit"><span>v1.6</span><a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a></p></div>
+    <div class="selHead"><button class="exitBtn exitTop" type="button">완전 종료</button><div class="logo">복린이 대전<small>ROOKIE BOXING BATTLE</small></div><p class="credit"><span>v1.7</span><a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a></p></div>
     <div class="sel" id="sel"></div>
     <p class="help selhelp"><b>↓</b> 숙이면 펀치 회피 · <b>뒤로 당기기/가드</b> 막기 · 펀치 <b>이어 누르면 콤보</b> · 게이지 차면 <b>SUPER</b> · 3판 2선승</p>
     <button class="btn" id="goBtn" type="button">링 위로 올라가기</button>
@@ -397,8 +397,8 @@ const CHARS=[
 const MOVES={
  jab:     {s:4, a:3,r:8, dmg:4, range:36,hs:13,kb:1.6,high:true, gain:6, cancel:['straight','hook','upper','body']},
  straight:{s:7, a:3,r:14,dmg:9, range:44,hs:16,kb:3,  high:true, gain:9, cancel:['hook','upper']},
- hook:    {s:9, a:3,r:16,dmg:12,range:34,hs:18,kb:4,  high:true, gain:10,cancel:['upper'],big:true},
- upper:   {s:10,a:4,r:20,dmg:14,range:31,hs:22,kb:3.5,high:false,gain:11,cancel:[],big:true},
+ hook:    {s:7, a:4,r:15,dmg:12,range:38,hs:20,kb:4.5,high:true, gain:10,cancel:['upper'],big:true,lunge:1.4,sy:52},
+ upper:   {s:7, a:4,r:18,dmg:14,range:34,hs:26,kb:2.2,high:false,gain:11,cancel:[],big:true,lunge:1.1,launch:-3.4,sy:58},
  body:    {s:7, a:3,r:13,dmg:7, range:36,hs:15,kb:1.8,high:false,gain:8, cancel:['straight','hook','upper']},
 };
 const SUPERS={
@@ -501,7 +501,10 @@ function pose(F){
     case 'walk':p.step=Math.sin(F.walkT*.25)*4;break;
     case 'crouch':p.cr=10;p.fr=[12,-47];p.rr=[8,-45];break;
     case 'block':case 'blockstun':p.cr=F.ctrl&&F.ctrl.down?10:2;p.fr=[11,-53];p.rr=[10,-47];break;
-    case 'hitstun':p.lean=-4;p.fr=[9,-43];p.rr=[5,-41];p.tilt=-1;break;
+    case 'hitstun':
+      if(F.hitBy==='upper'){p.lean=-6;p.fr=[6,-60];p.rr=[1,-58];p.tilt=-2;}
+      else if(F.hitBy==='hook'){p.lean=-5;p.fr=[8,-44];p.rr=[3,-42];p.tilt=-3;}
+      else{p.lean=-4;p.fr=[9,-43];p.rr=[5,-41];p.tilt=-1;}break;
     case 'ko':p.lean=-5;p.fr=[4,-40];p.rr=[0,-38];break;
     case 'win':{const w=Math.sin((F.anim||0)*.3)*2;p.rr=[1,-76+w];p.fr=[8,-75-w];break;}
     case 'cry':{const k=Math.round(Math.sin((F.anim||0)*.45)*1.5);p.sit=true;p.lean=2;p.fr=[10,-11+k];p.rr=[7,-10-k];break;}
@@ -509,8 +512,12 @@ function pose(F){
       const m=F.md,f=F.mf;let e=f<m.s?-.3*f/m.s:f<m.s+m.a?1:1-(f-m.s-m.a)/m.r;const ep=Math.max(0,e);
       if(F.move==='jab')p.fr=[14+18*e,-48];
       else if(F.move==='straight'){p.rr=[8+27*e,-48];p.lean=3*ep;p.step=2*ep;}
-      else if(F.move==='hook'){p.fr=[6+17*ep-(e<0?4:0),-53+2*ep];p.lean=2*e;p.hookE=true;}
-      else if(F.move==='upper'){p.cr=6*(1-ep);p.rr=[8+11*ep,-34-28*ep];p.lean=1;}
+      else if(F.move==='hook'){ // wind out wide, then whip across at head height with the elbow up
+        if(e<0){const w=-e/.3;p.fr=[10-8*w,-50-2*w];p.lean=-1.5*w;p.rr=[9,-47];}
+        else{p.fr=[4+22*e,-56+3*e];p.lean=4.5*e;p.step=3*e;p.rr=[7,-46];p.hookE=true;p.trail=f>=m.s&&f<m.s+m.a?'hook':null;}}
+      else if(F.move==='upper'){ // dip low, then drive up through the chin
+        if(e<0){const w=-e/.3;p.cr=10*w;p.rr=[6,-32];p.fr=[12,-52];p.lean=1;}
+        else{p.cr=3*(1-e);p.rr=[10+11*e,-32-42*e];p.fr=[12,-52];p.lean=3*e;p.step=2*e;p.trail=f>=m.s&&f<m.s+m.a?'upper':null;}}
       else if(F.move==='body'){p.cr=8;p.fr=[14+17*ep,-44];p.rr=[8,-48];p.lean=2*ep;}
       break;}
     case 'super':{
@@ -538,6 +545,8 @@ function drawFighter(c,F,x,y){
     if(ch.top==='jacket')return rear?ch.topD:ch.topC;
     if(ch.top==='tee'&&upper)return rear?ch.topD:ch.topC;
     return rear?ch.skinD:ch.skin;};
+  if(p.trail==='hook'){g.globalAlpha=.4;for(let i=0;i<7;i++){const a=i/6;R(6+18*a,-62+10*a*a+cr,2,2,'#fff');}g.globalAlpha=1;}
+  if(p.trail==='upper'){g.globalAlpha=.4;for(let i=0;i<7;i++){const a=i/6;R(12+8*a,-30-40*a+cr,2,2,'#fff');}g.globalAlpha=1;}
   const arm=(s,gl,rear,hook)=>{
     const m=[(s[0]+gl[0])/2-2,(s[1]+gl[1])/2+(hook?-3:4)];
     L(s[0],s[1],m[0],m[1],4,armCol(rear,true));
@@ -720,10 +729,11 @@ function applyHit(A,D,h){
   let dmg=h.dmg*A.ch.pow*(1-.08*Math.min(A.combo,6))*(counter?1.25:1);dmg=Math.max(1,Math.round(dmg));
   D.hp-=dmg;A.combo++;A.stats.max=Math.max(A.stats.max,A.combo);A.stats.dealt+=dmg;
   if(counter){A.stats.counters++;popAt('카운터!',D.x,GROUND-74,'cnt');}
-  D.st='hitstun';D.t=h.hs+(counter?6:0);D.vx=A.f*h.kb;D.mf=0;D.buf=null;
+  D.st='hitstun';D.t=h.hs+(counter?6:0);D.vx=A.f*h.kb;D.mf=0;D.buf=null;D.hitBy=A.move&&A.st==='attack'?A.move:null;
+  if(h.launch){D.vy=h.launch;D.y=Math.min(D.y,-1);}
   A.hitLanded=true;A.sup=Math.min(100,A.sup+h.gain);D.sup=Math.min(100,D.sup+h.gain*.5);
   const big=h.big||h.sup;hitstop=Math.max(hitstop,big?9:5);shake=Math.max(shake,big?4:2);
-  spark(D.x-A.f*5,GROUND-(h.high===false&&!h.sup?36:48),'hit');popAt(String(dmg),D.x,GROUND-62);
+  spark(D.x-A.f*5,GROUND-(h.sy||(h.high===false&&!h.sup?36:48))+D.y,h.big?'big':'hit');popAt(String(dmg),D.x,GROUND-62);
   sfx.punch(big?3:(h.dmg>=7?2:1));
   if(D===P1){flash();buzz(big?60:30);} else buzz(big?25:12);
   lastAtk=A;
@@ -740,12 +750,14 @@ function updateFighter(F,O){
   const canAct=mode==='fight';
   switch(F.st){
     case 'hitstun':case 'blockstun':
-      F.t--;F.x+=F.vx;F.vx*=.82;if(F.t<=0){F.st='idle';O.combo=0;}break;
+      if(F.y<0||F.vy<0){F.vy+=.38;F.y+=F.vy;if(F.y>=0){F.y=0;F.vy=0;}}
+      F.t--;F.x+=F.vx;F.vx*=.82;if(F.t<=0&&F.y>=0){F.st='idle';O.combo=0;}break;
     case 'ko':F.x+=F.vx;F.vx*=.96;F.vy+=.35;F.y+=F.vy;if(F.y>=0){F.y=0;F.vy=0;F.vx*=.5;}F.koT++;break;
     case 'win':F.y=-Math.abs(Math.sin(F.anim*.18))*6;break;
     case 'cry':F.y=0;F.vx=0;break;
     case 'attack':{
       F.mf++;const m=F.md;
+      if(m.lunge&&F.mf<=m.s+m.a&&Math.abs(O.x-F.x)>24)F.x+=F.f*m.lunge;
       if(!F.hitDone&&F.mf>=m.s&&F.mf<m.s+m.a){
         const d=Math.abs(O.x-F.x);if(d<=m.range+6&&Math.sign(O.x-F.x)===F.f){F.hitDone=true;applyHit(F,O,m);}}
       if(canAct&&F.buf&&F.hitLanded&&F.mf>=m.s){const mv=resolveMove(F.buf,c);
@@ -869,9 +881,10 @@ function drawPigeonBird(p){
 }
 function drawSpark(s){
   const k=s.t,col=s.kind==='block'?'#7fc4ff':'#fff2a0',col2=s.kind==='block'?'#3f7bff':'#ff8a3a';
-  ctx.fillStyle=col2;const r=3+k*1.6;
-  for(let i=0;i<8;i++){const a=i*Math.PI/4+.3;ctx.fillRect(Math.round(s.x+Math.cos(a)*r)-1,Math.round(s.y+Math.sin(a)*r)-1,2,2);}
-  if(k<5){ctx.fillStyle=col;ctx.fillRect(s.x-5+k,s.y-1,10-2*k,2);ctx.fillRect(s.x-1,s.y-5+k,2,10-2*k);}
+  const big=s.kind==='big',n=big?12:8;ctx.fillStyle=col2;const r=(big?4:3)+k*(big?2.6:1.6);
+  for(let i=0;i<n;i++){const a=i*Math.PI*2/n+.3;const z=big&&i%2?3:2;ctx.fillRect(Math.round(s.x+Math.cos(a)*r)-1,Math.round(s.y+Math.sin(a)*r)-1,z,z);}
+  if(big&&k<3){ctx.fillStyle='rgba(255,255,255,.85)';ctx.fillRect(s.x-4,s.y-4,8,8);}
+  if(k<5){const L=big?8:5;ctx.fillStyle=col;ctx.fillRect(s.x-L+k,s.y-1,2*L-2*k,2);ctx.fillRect(s.x-1,s.y-L+k,2,2*L-2*k);}
 }
 function render(){
   ctx.setTransform(1,0,0,1,0,0);
@@ -983,7 +996,7 @@ function makeCard(){
   x.fillText(win?'나랑 붙어볼 복서 구함 👊':'누가 대신 복수 좀 👊',540,1160);
   x.fillStyle='#151233';x.fillRect(0,1232,1080,120);
   x.font='700 34px "Noto Sans KR",sans-serif';x.fillStyle='#f6efe3';x.fillText('@nangman.boxer',540,1272);
-  x.font='26px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';x.fillText('dy747.github.io/bokrini-battle  ·  v1.6',540,1314);
+  x.font='26px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';x.fillText('dy747.github.io/bokrini-battle  ·  v1.7',540,1314);
   return C;
 }
 let shotFile=null;
