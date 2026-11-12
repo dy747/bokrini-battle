@@ -276,6 +276,9 @@ html.port .endTxt{align-items:center}
 .endLine{margin:0;white-space:pre-line;font-size:clamp(13px,calc(var(--lh,1vh)*3.8),18px);line-height:1.7;font-weight:700;color:var(--chalk);min-height:6.8em}
 #endBtn{align-self:flex-start;min-width:0}
 html.port #endBtn{align-self:center}
+.b .n{font:400 clamp(20px,calc(var(--lh,1vh)*7),30px)/1 var(--f-display)}
+.pop.cmb{font-size:calc(var(--u)*15px);color:var(--gold);text-shadow:calc(var(--u)*.8px) calc(var(--u)*.8px) 0 var(--red),0 0 calc(var(--u)*6px) rgba(255,59,85,.8);animation:cmb .9s ease-out forwards;z-index:2}
+@keyframes cmb{0%{opacity:0;transform:translate(-50%,-50%) scale(2.2) rotate(-6deg)}14%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(-6deg)}75%{opacity:1;transform:translate(-50%,-70%) scale(1) rotate(-6deg)}100%{opacity:0;transform:translate(-50%,-90%) scale(.9) rotate(-6deg)}}
 </style>
 
 </head>
@@ -316,8 +319,8 @@ html.port #endBtn{align-self:center}
   <div id="joy" aria-label="이동 조이스틱"><div id="knob"></div></div>
   <div id="btns">
     <button class="b gd" data-k="guard" style="grid-area:g" type="button">가드<small>U</small></button>
-    <button class="b bl" data-k="jab" style="grid-area:j" type="button">잽<small>J</small></button>
-    <button class="b bl" data-k="straight" style="grid-area:s" type="button">스트<small>K</small></button>
+    <button class="b bl" data-k="jab" style="grid-area:j" type="button"><span class="n">1</span><small>J</small></button>
+    <button class="b bl" data-k="straight" style="grid-area:s" type="button"><span class="n">2</span><small>K</small></button>
     <button class="b rd" data-k="hook" style="grid-area:h" type="button">훅<small>L</small></button>
     <button class="b rd" data-k="upper" style="grid-area:u" type="button">어퍼<small>I</small></button>
     <button class="b su" data-k="super" id="supBtn" style="grid-area:x" type="button">SUPER<small>O</small></button>
@@ -326,9 +329,9 @@ html.port #endBtn{align-self:center}
 
 <div class="ov" id="selOv">
   <div class="card">
-    <div class="selHead"><div class="selLeft"><button class="exitBtn exitTop" type="button">완전 종료</button><p class="cnt" id="cnt" aria-live="polite"></p></div><div class="logo">복린이 대전<small>ROOKIE BOXING BATTLE</small></div><p class="credit"><span>v2.2</span><a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a></p></div>
+    <div class="selHead"><div class="selLeft"><button class="exitBtn exitTop" type="button">완전 종료</button><p class="cnt" id="cnt" aria-live="polite"></p></div><div class="logo">복린이 대전<small>ROOKIE BOXING BATTLE</small></div><p class="credit"><span>v2.3</span><a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a></p></div>
     <div class="sel" id="sel"></div>
-    <p class="help selhelp"><b>↓</b> 숙이면 펀치 회피 · <b>뒤로 당기기/가드</b> 막기 · 펀치 <b>이어 누르면 콤보</b> · 게이지 차면 <b>SUPER</b> · 3판 2선승</p>
+    <p class="help selhelp">콤보 <b>1-1 · 1-1-2 · 1-2 · 1-어퍼 · 훅-2 · 훅-어퍼</b> 빠르게 이어 누르기 · <b>↓</b> 숙여 피하기 · <b>뒤로/가드</b> 막기</p>
     <button class="btn" id="goBtn" type="button">링 위로 올라가기</button>
   </div>
 </div>
@@ -431,9 +434,9 @@ const CHARS=[
 (()=>{const k=['skin','skinD','top','topC','topD','collar','legs','legC','stripe','hand','glove','gloveD','shoe','sock','width','head'];
  const a=CHARS[0],b=CHARS[1];for(const p of k){const t=a[p];a[p]=b[p];b[p]=t;if(a[p]===undefined)delete a[p];if(b[p]===undefined)delete b[p];}})();
 const MOVES={
- jab:     {s:4, a:3,r:8, dmg:4, range:36,hs:13,kb:1.6,high:true, gain:6, cancel:['straight','hook','upper','body']},
+ jab:     {s:4, a:3,r:8, dmg:4, range:36,hs:13,kb:1.6,high:true, gain:6, cancel:['jab','straight','hook','upper','body']},
  straight:{s:7, a:3,r:14,dmg:9, range:44,hs:16,kb:3,  high:true, gain:9, cancel:['hook','upper']},
- hook:    {s:7, a:4,r:15,dmg:12,range:38,hs:20,kb:4.5,high:true, gain:10,cancel:['upper'],big:true,lunge:1.4,sy:52},
+ hook:    {s:7, a:4,r:15,dmg:12,range:38,hs:20,kb:4.5,high:true, gain:10,cancel:['straight','upper'],big:true,lunge:1.4,sy:52},
  upper:   {s:7, a:4,r:18,dmg:14,range:34,hs:26,kb:2.2,high:false,gain:11,cancel:[],big:true,lunge:1.1,launch:-3.4,sy:58},
  body:    {s:7, a:3,r:13,dmg:7, range:36,hs:15,kb:1.8,high:false,gain:8, cancel:['straight','hook','upper']},
 };
@@ -549,9 +552,10 @@ function pose(F){
       const m=F.md,f=F.mf;let e=f<m.s?-.3*f/m.s:f<m.s+m.a?1:1-(f-m.s-m.a)/m.r;const ep=Math.max(0,e);
       if(F.move==='jab')p.fr=[14+18*e,-48];
       else if(F.move==='straight'){p.rr=[8+27*e,-48];p.lean=3*ep;p.step=2*ep;}
-      else if(F.move==='hook'){ // wind out wide, then whip across at head height with the elbow up
-        if(e<0){const w=-e/.3;p.fr=[10-8*w,-50-2*w];p.lean=-1.5*w;p.rr=[9,-47];}
-        else{p.fr=[4+22*e,-56+3*e];p.lean=4.5*e;p.step=3*e;p.rr=[7,-46];p.hookE=true;p.trail=f>=m.s&&f<m.s+m.a?'hook':null;}}
+      else if(F.move==='hook'){ // load the hip, elbow rises to shoulder height, bent arm swings across at head height
+        if(e<0){const w=-e/.3;p.fr=[12-6*w,-50-3*w];p.fe=[7-1*w,-41];p.lean=-2.5*w;p.cr=2*w;p.rr=[9,-51];}
+        else{const k=e;p.fr=[6+20*k,-53+1*k];p.fe=[6+9*k,-42-4*k];p.lean=5*k;p.step=3*k;p.cr=1;p.rr=[8,-52];
+          p.trail=f>=m.s-1&&f<m.s+m.a?'hook':null;}}
       else if(F.move==='upper'){ // dip low, then drive up through the chin
         if(e<0){const w=-e/.3;p.cr=10*w;p.rr=[6,-32];p.fr=[12,-52];p.lean=1;}
         else{p.cr=3*(1-e);p.rr=[10+11*e,-32-42*e];p.fr=[12,-52];p.lean=3*e;p.step=2*e;p.trail=f>=m.s&&f<m.s+m.a?'upper':null;}}
@@ -582,10 +586,12 @@ function drawFighter(c,F,x,y){
     if(ch.top==='jacket')return rear?ch.topD:ch.topC;
     if(ch.top==='tee'&&upper)return rear?ch.topD:ch.topC;
     return rear?ch.skinD:ch.skin;};
-  if(p.trail==='hook'){g.globalAlpha=.4;for(let i=0;i<7;i++){const a=i/6;R(6+18*a,-62+10*a*a+cr,2,2,'#fff');}g.globalAlpha=1;}
+  if(p.trail==='hook'){ // wide horizontal swoosh behind the fist
+    for(let i=0;i<12;i++){const a=i/11,x=lean+2+26*a,y=-58+cr-6*Math.sin(Math.PI*a*.9)+4*a;g.globalAlpha=.15+.5*a;R(x,y,2,a>.5?3:2,'#fff');R(x,y+3,2,1,'#ffd27a');}
+    g.globalAlpha=1;}
   if(p.trail==='upper'){g.globalAlpha=.4;for(let i=0;i<7;i++){const a=i/6;R(12+8*a,-30-40*a+cr,2,2,'#fff');}g.globalAlpha=1;}
-  const arm=(s,gl,rear,hook)=>{
-    const m=[(s[0]+gl[0])/2-2,(s[1]+gl[1])/2+(hook?-3:4)];
+  const arm=(s,gl,rear,hook,el)=>{
+    const m=el?[el[0],el[1]+cr]:[(s[0]+gl[0])/2-2,(s[1]+gl[1])/2+(hook?-3:4)];
     L(s[0],s[1],m[0],m[1],4,armCol(rear,true));
     L(m[0],m[1],gl[0]-2,gl[1],ch.top==='jacket'?4:3,armCol(rear,false));
     if(ch.top==='jacket'&&ch.neon)L(m[0],m[1]-1,gl[0]-3,gl[1]-1,1,rear?'#7a2758':ch.neon);
@@ -623,7 +629,7 @@ function drawFighter(c,F,x,y){
     R(1,ty-14,14,8,gd);R(2,ty-6,12,2,gd);R(4,ty-4,8,1,gd2);R(6,ty-3,4,3,gd2);R(3,ty,10,2,gd);R(4,ty+2,8,1,gd2);
     R(-1,ty-13,2,5,gd2);R(15,ty-13,2,5,gd2);R(3,ty-13,2,5,gl);R(1,ty-15,14,1,gl);R(7,ty-11,2,2,'#ff3b55');}
   // front arm
-  arm(sF,gF,false,p.hookE);
+  arm(sF,gF,false,p.hookE,p.fe);
   c.restore();
 }
 
@@ -708,6 +714,7 @@ const sfx={
   champ(){const N=[[523,0,.12],[523,.13,.12],[523,.26,.12],[659,.4,.5],[587,.95,.18],[659,1.15,.18],[784,1.35,.9]];N.forEach(([f,at,d])=>{osc(f,null,d,'square',.24,sfxBus,at);osc(f/2,null,d,'triangle',.2,sfxBus,at);});[0,.4,1.35].forEach(at=>nz(.2,6000,.25,'highpass',1,sfxBus,at));this.crowd();},
   win(){[523,659,784,1047].forEach((f,i)=>osc(f,null,.14,'square',.22,sfxBus,i*.11));osc(1047,null,.55,'square',.2,sfxBus,.48);osc(784,null,.55,'square',.12,sfxBus,.48);},
   lose(){[392,370,349].forEach((f,i)=>osc(f,f*.97,.34,'triangle',.4,sfxBus,i*.38));osc(330,280,1.1,'triangle',.4,sfxBus,1.15);},
+  combo(n){osc(392,null,.08,'square',.16);osc(587,null,.08,'square',.16,sfxBus,.06);osc(n>2?988:784,null,.22,'square',.18,sfxBus,.12);nz(.12,5000,.2,'highpass',1,sfxBus,.12);},
   crowd(){nz(1.4,900,.12,'bandpass',.5);nz(1.2,2400,.06,'bandpass',.7,sfxBus,.15);}
 };
 /* --- chiptune BGM (A minor, 132 BPM) --- */
@@ -728,6 +735,9 @@ let voice=null;
 function pickVoice(){try{const vs=speechSynthesis.getVoices();voice=vs.find(v=>/^en/i.test(v.lang)&&/Daniel|Fred|Aaron|Arthur|Rocko|Ralph|Alex|Male|Google UK English Male/i.test(v.name))||vs.find(v=>/^en-(US|GB)/i.test(v.lang))||null;}catch(e){}}
 try{pickVoice();speechSynthesis.onvoiceschanged=pickVoice;}catch(e){}
 function say(t,rate=.92,pitch=.55){if(muted)return;try{const u=new SpeechSynthesisUtterance(t);u.lang='en-US';if(voice)u.voice=voice;u.rate=rate;u.pitch=pitch;u.volume=1;speechSynthesis.cancel();speechSynthesis.speak(u);}catch(e){}}
+let koVoice=null;function pickKo(){try{const vs=speechSynthesis.getVoices();koVoice=vs.find(v=>/^ko/i.test(v.lang))||null;}catch(e){}}
+try{pickKo();speechSynthesis.addEventListener('voiceschanged',pickKo);}catch(e){}
+function sayKo(t){if(muted)return;try{const u=new SpeechSynthesisUtterance(t);u.lang='ko-KR';if(koVoice)u.voice=koVoice;u.rate=1.25;u.pitch=.8;u.volume=1;speechSynthesis.cancel();speechSynthesis.speak(u);}catch(e){}}
 let voicePrimed=false;function primeVoice(){if(voicePrimed)return;voicePrimed=true;try{const u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u);}catch(e){}}
 function setMute(m){muted=m;try{localStorage.setItem('bk-mute',m?'1':'0')}catch(e){}if(master)master.gain.value=m?0:1;if(unlockEl){if(m)unlockEl.pause();else unlockSilentSwitch();}const b=document.getElementById('sndBtn');if(b)b.textContent=m?'🔇':'🔊';}
 function buzz(ms){try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}}
@@ -737,7 +747,7 @@ let mode='select',paused=false,round=1,timer=60,introT=0,endT=0,hitstop=0,superF
 let pick=0,P1,P2,lastAtk=null;
 function newFighter(ch,x,f,cpu){return{ch,x,y:0,vx:0,vy:0,f,hp:ch.hp,sup:0,st:'idle',t:0,mf:0,md:null,move:null,anim:0,walkT:0,koT:0,
   combo:0,hitDone:false,hitLanded:false,buf:null,bufT:0,wins:0,cpu,ctrl:{dir:0,down:false,guard:false,press:null},ai:{wait:20,chain:false,lvl:.55},
-  stats:{max:0,counters:0,supers:0,dealt:0}};}
+  stats:{max:0,counters:0,supers:0,dealt:0},seq:[],seqT:null};}
 
 /* ================= feedback ================= */
 const gm=$('game');
@@ -750,7 +760,10 @@ function spark(x,y,kind){sparks.push({x,y,t:0,kind});}
 /* ================= combat ================= */
 function scaled(m,spd){return Object.assign({},m,{s:Math.max(2,Math.round(m.s/spd)),r:Math.max(4,Math.round(m.r/spd))});}
 function resolveMove(b,c){if(b==='super')return 'super';if(c.down&&(b==='jab'||b==='straight'||b==='hook'))return 'body';return b;}
-function startMove(F,mv){F.st='attack';F.move=mv;F.md=scaled(MOVES[mv],F.ch.spd);F.mf=0;F.hitDone=false;F.hitLanded=false;sfx.swing();}
+const COMBOS=[{s:['jab','jab','straight'],n:'잽잽2',v:'잽 잽 투'},{s:['jab','jab'],n:'잽잽',v:'잽 잽'},{s:['jab','straight'],n:'원투',v:'원 투'},
+  {s:['jab','upper'],n:'원 어퍼',v:'원 어퍼'},{s:['hook','straight'],n:'훅 투',v:'훅 투'},{s:['hook','upper'],n:'훅 어퍼',v:'훅 어퍼'}];
+function matchCombo(seq){if(!seq||seq.length<2)return null;for(const c of COMBOS){const k=c.s.length;if(seq.length>=k&&c.s.every((m,i)=>seq[seq.length-k+i]===m))return c;}return null;}
+function startMove(F,mv){if(F.seqT!=null&&F.anim-F.seqT<=30)F.seq.push(mv);else F.seq=[mv];if(F.seq.length>4)F.seq.shift();F.seqT=F.anim;F.st='attack';F.move=mv;F.md=scaled(MOVES[mv],F.ch.spd);F.mf=0;F.hitDone=false;F.hitLanded=false;sfx.swing();}
 function startSuper(F){F.sup=0;F.st='super';F.sk=F.ch.super;F.mf=0;F.hitIdx=0;F.hitLanded=false;F.stats.supers++;superFreeze=38;
   callout(F.ch.superName,'sup');sfx.sup();lastAtk=F;}
 const isFree=F=>['idle','walk','crouch','block'].includes(F.st);
@@ -767,7 +780,9 @@ function applyHit(A,D,h){
     if(D.hp<=0){D.hp=0;doKO(A,D);}return 'block';}
   if(D.st==='super'&&SUPERS[D.sk].armor&&D.mf<22){D.hp-=Math.round(h.dmg*.5);spark(D.x-A.f*6,GROUND-46,'block');sfx.block();hitstop=4;if(D.hp<=0){D.hp=0;doKO(A,D);}return 'armor';}
   const counter=D.st==='attack'&&D.mf<D.md.s;
-  let dmg=h.dmg*A.ch.pow*(1-.08*Math.min(A.combo,6))*(counter?1.25:1);dmg=Math.max(1,Math.round(dmg));
+  const cmb=A.st==='attack'?matchCombo(A.seq):null;
+  let dmg=h.dmg*A.ch.pow*(1-.08*Math.min(A.combo,6))*(counter?1.25:1)*(cmb?1.2:1);dmg=Math.max(1,Math.round(dmg));
+  if(cmb){popAt(cmb.n+'!',(A.x+D.x)/2,GROUND-92,'cmb');sfx.combo(cmb.s.length);if(A===P1)sayKo(cmb.v);hitstop=Math.max(hitstop,7);shake=Math.max(shake,3);}
   D.hp-=dmg;A.combo++;A.stats.max=Math.max(A.stats.max,A.combo);A.stats.dealt+=dmg;
   if(counter){A.stats.counters++;popAt('카운터!',D.x,GROUND-74,'cnt');}
   D.st='hitstun';D.t=h.hs+(counter?6:0);D.vx=A.f*h.kb;D.mf=0;D.buf=null;D.hitBy=A.move&&A.st==='attack'?A.move:null;
@@ -787,7 +802,7 @@ function doKO(A,D){if(mode!=='fight')return;D.st='ko';D.vx=A.f*3.2;D.vy=-3.6;D.y
 /* ================= fighter update ================= */
 function updateFighter(F,O){
   F.anim++;const c=F.ctrl;
-  if(c.press){F.buf=c.press;F.bufT=8;c.press=null;}else if(F.bufT>0)F.bufT--;else F.buf=null;
+  if(c.press){F.buf=c.press;F.bufT=12;c.press=null;}else if(F.bufT>0)F.bufT--;else F.buf=null;
   const canAct=mode==='fight';
   switch(F.st){
     case 'hitstun':case 'blockstun':
@@ -833,7 +848,7 @@ function cpuThink(F,O){
   const c=F.ctrl;
   if(F.st==='attack'&&F.hitLanded&&F.ai.chain){const nx={jab:'straight',straight:'hook',body:'upper',hook:'upper'}[F.move];
     if(nx&&F.mf>=F.md.s+F.md.a-1){c.press=nx;F.ai.chain=Math.random()<F.ai.lvl*.5;}}
-  if(--F.ai.wait>0)return;F.ai.wait=4+(Math.random()*7|0);
+  if(--F.ai.wait>0)return;F.ai.wait=9+(Math.random()*12|0);
   const d=Math.abs(O.x-F.x),tw=Math.sign(O.x-F.x),lvl=F.ai.lvl;
   c.down=false;c.guard=false;c.dir=0;
   if(!isFree(F))return;
@@ -844,7 +859,8 @@ function cpuThink(F,O){
   if(O.st==='attack'&&O.mf>=O.md.s+O.md.a&&d<40&&Math.random()<lvl){c.press=Math.random()<.5?'straight':'hook';F.ai.chain=true;return;}
   if(O.st==='crouch'&&d<30&&Math.random()<.6){c.press='upper';return;}
   if(F.sup>=100&&d<40&&Math.random()<.4){c.press='super';return;}
-  if(d>42){c.dir=Math.random()<.82?tw:0;return;}
+  if(d>42){c.dir=Math.random()<.6?tw:0;if(!c.dir&&Math.random()<.4)c.guard=true;return;}
+  if(Math.random()<.28){c.dir=Math.random()<.5?0:(Math.random()<.5?tw:-tw);F.ai.wait=8+(Math.random()*10|0);return;}
   if(d<27&&Math.random()<.35){c.dir=-tw;F.ai.wait=10;return;}
   if(Math.random()<.18){c.guard=true;F.ai.wait=14;return;}
   const r=Math.random();c.press=r<.36?'jab':r<.6?'straight':r<.74?'hook':r<.86?'upper':'body';
@@ -902,14 +918,14 @@ function step(){
     if(introT===35){callout('BOX!');say('Box!',1.05,.6);sfx.bell();}
     if(introT<=0){mode='fight';clearCallout();}
   }
-  if(mode==='fight'){timer-=1/60;if(timer<=0){timer=0;timeOver();}}
+  if(mode==='fight'){timer-=STEP;if(timer<=0){timer=0;timeOver();}}
   if(mode==='end'){endT++;
     if(endT===70&&rWin){const Lz=rWin===P1?P2:P1;
       Object.assign(rWin,{st:'win',vx:0,vy:0,y:0,f:Lz.x>rWin.x?1:-1});Object.assign(Lz,{st:'cry',vx:0,vy:0,y:0,f:rWin.x>Lz.x?1:-1});
       projs=[];
       if(rWin===P1){callout('YOU WIN','hi');say('You win!',1,.7);sfx.win();}else{callout('YOU LOSE','hi lose');say('You lose',.85,.5);sfx.lose();}}
     if(endT===70&&!rWin)callout('무승부');
-    if(endT>=250){clearCallout();afterRound();return;}}
+    if(endT>=200){clearCallout();afterRound();return;}}
   // inputs
   P1.ctrl.dir=inp.dir;P1.ctrl.down=inp.down;P1.ctrl.guard=inp.guard;if(inp.press){P1.ctrl.press=inp.press;inp.press=null;}
   if(mode==='fight')cpuThink(P2,P1);else{P2.ctrl.dir=0;P2.ctrl.guard=false;P2.ctrl.down=false;}
@@ -971,10 +987,11 @@ function hud(){
 }
 
 /* ================= loop ================= */
+const STEP=1/44; // simulation rate: 44 steps/s (was 60) = slower, readable fights
 let last=performance.now(),acc=0,selAnim=0;
 function frame(ts){
   const dt=Math.min(.1,(ts-last)/1000);last=ts;acc+=dt;
-  while(acc>=1/60){step();acc-=1/60;selAnim++;}
+  while(acc>=STEP){step();acc-=STEP;selAnim++;}
   render();hud();
   if(mode==='select')drawSelect();
   if(mode==='result')drawResult();
@@ -1220,7 +1237,7 @@ function makeChampCard(){
   T(ENDTXT[arc.ch.id].key,1195,'900 40px "Noto Sans KR",sans-serif','#ff4fb0');
   x.fillStyle='#151233';x.fillRect(0,1240,1080,110);
   T('@nangman.boxer',1278,'700 34px "Noto Sans KR",sans-serif','#f6efe3');
-  T('dy747.github.io/bokrini-battle  ·  v2.2',1318,'26px "Noto Sans KR",sans-serif','#a39cc9');
+  T('dy747.github.io/bokrini-battle  ·  v2.3',1318,'26px "Noto Sans KR",sans-serif','#a39cc9');
   return C;}
 
 let resScene=null;
@@ -1270,7 +1287,7 @@ function makeCard(){
   x.fillText(champ?'복린이 체육관 접수 완료 🏆':win?'나랑 붙어볼 복서 구함 👊':'누가 대신 복수 좀 👊',540,1160);
   x.fillStyle='#151233';x.fillRect(0,1232,1080,120);
   x.font='700 34px "Noto Sans KR",sans-serif';x.fillStyle='#f6efe3';x.fillText('@nangman.boxer',540,1272);
-  x.font='26px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';x.fillText('dy747.github.io/bokrini-battle  ·  v2.2',540,1314);
+  x.font='26px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';x.fillText('dy747.github.io/bokrini-battle  ·  v2.3',540,1314);
   return C;
 }
 let shotFile=null;
