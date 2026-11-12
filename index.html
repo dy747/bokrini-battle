@@ -316,7 +316,7 @@ html.port #endBtn{align-self:center}
 
 <div class="ov" id="selOv">
   <div class="card">
-    <div class="selHead"><button class="exitBtn exitTop" type="button">완전 종료</button><div class="logo">복린이 대전<small>ROOKIE BOXING BATTLE</small></div><p class="credit"><span>v2.0</span><a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a></p></div>
+    <div class="selHead"><button class="exitBtn exitTop" type="button">완전 종료</button><div class="logo">복린이 대전<small>ROOKIE BOXING BATTLE</small></div><p class="credit"><span>v2.1</span><a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a></p></div>
     <div class="sel" id="sel"></div>
     <p class="help selhelp"><b>↓</b> 숙이면 펀치 회피 · <b>뒤로 당기기/가드</b> 막기 · 펀치 <b>이어 누르면 콤보</b> · 게이지 차면 <b>SUPER</b> · 3판 2선승</p>
     <button class="btn" id="goBtn" type="button">링 위로 올라가기</button>
@@ -1137,7 +1137,7 @@ candy(){
       Qd(L,HL,1,64,24,74,20,86,22);Qd(L,HL,1,52,46,54,40,60,36);Qd(L,HL,1,106,46,106,40,100,36);Ef(L,HS,104,66,3,8);});});
   const neck=part(L=>{Pf(L,SK,72,60,88,60,91,90,69,90);atop(L,()=>{pf(L,SD,68,60,24,9);pf(L,'#d9a27e',68,69,24,2);});});
   const body=part(L=>{torso(L,T,TS);Qd(L,'#2a2733',2,69,84,80,92,91,84);Ln(L,'#24212b',1,44,100,52,118);Ln(L,'#24212b',1,116,100,108,118);
-    Tx(L,'#d4d4dc','CAN.D','bold 11px "Black Han Sans","Noto Sans KR",sans-serif',80,106);});
+    Tx(L,'#d4d4dc','KEN.D','bold 11px "Black Han Sans","Noto Sans KR",sans-serif',80,106);});
   const head=part(L=>{Pf(L,SK,67,48,69,62,80,69,91,62,93,48);Ef(L,SK,80,48,13,16);atop(L,()=>Ef(L,SD,91,53,5,13));
     Qd(L,'#8a6a50',1,69,45,73,43,78,45);Qd(L,'#8a6a50',1,83,45,87,43,92,45);
     for(const ex of [71,84]){pf(L,'#c48d6b',ex,47,6,1);pf(L,'#f4ece6',ex,49,6,2);pf(L,'#3a2418',ex+2,49,3,2);pf(L,'#1a1010',ex-1,48,8,1);pf(L,'#1a1010',ex+6,47,2,1);}
@@ -1210,7 +1210,7 @@ function makeChampCard(){
   T(ENDTXT[arc.ch.id].key,1195,'900 40px "Noto Sans KR",sans-serif','#ff4fb0');
   x.fillStyle='#151233';x.fillRect(0,1240,1080,110);
   T('@nangman.boxer',1278,'700 34px "Noto Sans KR",sans-serif','#f6efe3');
-  T('dy747.github.io/bokrini-battle  ·  v2.0',1318,'26px "Noto Sans KR",sans-serif','#a39cc9');
+  T('dy747.github.io/bokrini-battle  ·  v2.1',1318,'26px "Noto Sans KR",sans-serif','#a39cc9');
   return C;}
 
 let resScene=null;
@@ -1260,7 +1260,7 @@ function makeCard(){
   x.fillText(champ?'복린이 체육관 접수 완료 🏆':win?'나랑 붙어볼 복서 구함 👊':'누가 대신 복수 좀 👊',540,1160);
   x.fillStyle='#151233';x.fillRect(0,1232,1080,120);
   x.font='700 34px "Noto Sans KR",sans-serif';x.fillStyle='#f6efe3';x.fillText('@nangman.boxer',540,1272);
-  x.font='26px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';x.fillText('dy747.github.io/bokrini-battle  ·  v2.0',540,1314);
+  x.font='26px "Noto Sans KR",sans-serif';x.fillStyle='#a39cc9';x.fillText('dy747.github.io/bokrini-battle  ·  v2.1',540,1314);
   return C;
 }
 let shotFile=null;
