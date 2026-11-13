@@ -359,7 +359,7 @@ html.port #endBtn{align-self:center}
 
 <div class="ov" id="selOv">
   <div class="card">
-    <div class="selHead"><div class="selLeft"><button class="exitBtn exitTop" type="button">완전 종료</button><p class="cnt" id="cnt" aria-live="polite"></p></div><div class="logo">복린이 대전<small>ROOKIE BOXING BATTLE</small></div><p class="credit"><span>v3.3</span><a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a></p></div>
+    <div class="selHead"><div class="selLeft"><button class="exitBtn exitTop" type="button">완전 종료</button><p class="cnt" id="cnt" aria-live="polite"></p></div><div class="logo">복린이 대전<small>ROOKIE BOXING BATTLE</small></div><p class="credit"><span>v3.4</span><a href="https://instagram.com/nangman.boxer" target="_blank" rel="noopener">@nangman.boxer</a></p></div>
     <div class="sel" id="sel"></div>
     <p class="help selhelp"><b>뒤로+2</b> 또는 <b>백스텝→2</b> 쓱박 · 펀치마다 <b>스태미나</b> 소모, 가드·백스텝으로 회복 · 콤보 <b>1-1 · 1-2 · 1-어퍼 · 훅-훅 · 훅-2</b> … 숨은 기술도 찾아보세요</p>
     <button class="btn" id="goBtn" type="button">링 위로 올라가기</button>
@@ -950,27 +950,41 @@ function cpuThink(F,O){
   if(O.st==='attack'&&O.mf>=O.md.s+O.md.a&&d<40&&Math.random()<lvl){c.press=Math.random()<.5?'straight':'hook';F.ai.chain=true;return;}
   if(O.st==='crouch'&&d<30&&Math.random()<.6){c.press='upper';return;}
   if(F.sup>=100&&d<40&&Math.random()<.4){c.press='super';return;}
-  const mid=(F.x+O.x)/2,CENTER=(WALL_L+WALL_R)/2;
-  const oCorner=Math.min(O.x-WALL_L,WALL_R-O.x)<46,myCorner=Math.min(F.x-WALL_L,WALL_R-F.x)<46;
+  const myCorner=Math.min(F.x-WALL_L,WALL_R-F.x)<40,oCorner=Math.min(O.x-WALL_L,WALL_R-O.x)<40;
   const backRoom=F.f>0?F.x-WALL_L:WALL_R-F.x;
-  // opponent pinned on the ropes: often give ground so the fight returns to the centre
-  if(oCorner&&!myCorner)F.ai.lure=(F.ai.lure||0)+1;else F.ai.lure=0;
-  // opponent pinned on the ropes: give ground and wait for them to come out to the middle (~3s), then go back in
-  if(oCorner&&!myCorner&&F.ai.lure<26){
-    if(backRoom>30&&(d<70||Math.abs(mid-CENTER)>40)){if(Math.random()<.3)c.press='bstep';else c.dir=-tw;F.ai.wait=10+(Math.random()*8|0);return;}
-    if(Math.random()<.5)c.guard=true;F.ai.wait=10+(Math.random()*8|0);return;}
-  // AI itself near the ropes: step forward / sideways back to the middle
-  if(myCorner&&d>30&&Math.random()<.6){c.dir=tw;F.ai.wait=10;return;}
-  // fighting distance band ~32-46: hover in it, bob in and out
-  if(d>46&&Math.abs(mid-CENTER)>24&&Math.sign(CENTER-mid)!==tw&&d<90&&Math.random()<.75){ // approaching would drag the fight off-centre: hold and let them come
-    if(Math.random()<.4)c.guard=true;else if(Math.random()<.4)c.dir=-tw;F.ai.wait=10+(Math.random()*10|0);return;}
-  if(d>46){c.dir=Math.random()<.55?tw:0;if(!c.dir&&Math.random()<.4)c.guard=true;F.ai.wait=8+(Math.random()*8|0);return;}
-  if(d<30&&backRoom>30&&Math.random()<.5){if(Math.random()<.3)c.press='bstep';else c.dir=-tw;F.ai.wait=8+(Math.random()*8|0);return;}
-  if(Math.random()<.3){const toward=Math.abs(mid-CENTER)>30?(Math.sign(CENTER-mid)===tw?tw:-tw):(Math.random()<.5?tw:-tw);
-    c.dir=Math.random()<.25?0:toward;F.ai.wait=8+(Math.random()*10|0);return;}
-  if(Math.random()<.18){c.guard=true;F.ai.wait=14;return;}
-  const r=Math.random();c.press=r<.36?'jab':r<.6?'straight':r<.74?'hook':r<.86?'upper':'body';
-
+  // ---- mood: press (밀기) / feel-out (간보기) / pull back (빼기) — rotates every 1.5~3s ----
+  const ai=F.ai;ai.moodT=(ai.moodT||0)-1;
+  if(!ai.mood||ai.moodT<=0){
+    let w={press:.38+lvl*.25,feel:.34,pull:.24};
+    if(O.tired||O.stam<O.stamMax*.3)w.press+=.6;
+    if(F.stam<F.stamMax*.35)w.pull+=.5;
+    if(myCorner)w.press+=.5,w.pull=0;
+    if(F.hp<O.hp*.7)w.press+=.15;
+    const tot=w.press+w.feel+w.pull;let r=Math.random()*tot;
+    ai.mood=(r-=w.press)<0?'press':(r-=w.feel)<0?'feel':'pull';
+    ai.moodT={press:10,feel:8,pull:6}[ai.mood]+(Math.random()*6|0); // in think-ticks (~0.1s each)
+  }
+  if(myCorner&&ai.mood==='pull')ai.mood='press';
+  const punch=()=>{const r=Math.random();c.press=r<.36?'jab':r<.6?'straight':r<.74?'hook':r<.86?'upper':'body';ai.chain=Math.random()<lvl*.75;};
+  if(ai.mood==='press'){ // walk them down, cut off space, throw in bunches
+    F.ai.wait=4+(Math.random()*6|0);
+    if(d>44){c.dir=tw;if(d<56&&Math.random()<.3)c.press='jab';return;}
+    if(Math.random()<.72){punch();return;}
+    if(Math.random()<.5){c.dir=tw;return;}c.guard=true;return;}
+  if(ai.mood==='pull'){ // give ground, make them reach, then pop them on the way in
+    F.ai.wait=5+(Math.random()*7|0);
+    if(d<44&&O.st==='walk'&&Math.random()<.55){c.press=Math.random()<.5?'straight':'hook';ai.chain=Math.random()<lvl*.5;return;}
+    if(d<62&&backRoom>26){if(Math.random()<.3)c.press='bstep';else c.dir=-tw;return;}
+    if(Math.random()<.5)c.guard=true;return;}
+  // feel-out: bounce in and out on the edge of range, feint, pick at them with jabs
+  F.ai.wait=4+(Math.random()*7|0);
+  if(d>58){c.dir=tw;return;}
+  const r=Math.random();
+  if(d<=46&&r<.38){punch();return;}
+  if(r<.62){c.dir=tw;F.ai.wait=3+(Math.random()*4|0);return;}           // step in (feint)
+  if(r<.84&&backRoom>26){c.dir=-tw;F.ai.wait=3+(Math.random()*4|0);return;} // step out
+  if(r<.92){c.guard=true;return;}
+  c.down=true;F.ai.wait=4;return;
   F.ai.chain=Math.random()<lvl*.7;
 }
 
@@ -1048,9 +1062,6 @@ function step(){
   // push apart
   if(P1.st!=='ko'&&P2.st!=='ko'){const dx=P2.x-P1.x,ad=Math.abs(dx);if(ad<26){const o=(26-ad)/2*(dx>=0?1:-1);P1.x-=o;P2.x+=o;}}
   if(P2.entering){P2.x-=2.4;P2.f=-1;P2.st='walk';P2.walkT+=1.6;if(P2.x<=210){P2.x=210;P2.entering=false;P2.st='idle';}}
-  if(mode==='fight'){ // gentle ring pull: while nobody is mid-exchange, the pair eases back toward the centre
-    const calm=F=>['idle','walk','crouch','block'].includes(F.st);
-    const off=(WALL_L+WALL_R)/2-(P1.x+P2.x)/2;if(calm(P1)&&calm(P2)&&Math.abs(off)>20){const v=Math.sign(off)*.2;P1.x+=v;P2.x+=v;}}
   for(const [F,O] of [[P1,P2],[P2,P1]]){if(F.entering)continue;const nx=clamp(F.x,WALL_L,WALL_R),over=F.x-nx;
     if(over&&['hitstun','blockstun'].includes(F.st)&&O.st!=='ko'&&!O.entering)O.x=clamp(O.x-over*.9,WALL_L,WALL_R);F.x=nx;}
   // projectiles
